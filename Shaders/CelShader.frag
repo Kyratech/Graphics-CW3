@@ -13,7 +13,7 @@ uniform sampler2D ourTexture;
 
 void main()
 {
-	float ambientStrength = 0.1f;
+	float ambientStrength = 0.4f;
     vec4 ambientLight = ambientStrength * lightColour;
 
     vec3 normals = normalize(normalVec);

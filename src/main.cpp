@@ -81,13 +81,13 @@ int main(void)
 	glEnable(GL_DEPTH_TEST);
 
     /* Load the shader program */
-	Shader textureShader("Shaders/TexturedDefault.vert", "Shaders/TexturedDefault.frag");
-	textureShader.Use();
+	Shader celShader("Shaders/CelShader.vert", "Shaders/CelShader.frag");
+	celShader.Use();
 
     /* Load in a obj file */
     GLfloat white[3] = {1.0f, 1.0f, 1.0f};
-    OBJMesh thunderbirdMesh("Models/DuelTank_body.obj", "Images/DuelTank_body.png", white);
-    GraphicsObject thunderbirdObject(&thunderbirdMesh, glm::vec3(0.0f), glm::quat());
+    OBJMesh tankBodyMesh("Models/DuelTank_body_smooth.obj", "Images/DuelTank_body.png", white);
+    GraphicsObject tankBodyObject(&tankBodyMesh, glm::vec3(0.0f), glm::quat());
 
 	/* Main loop */
 	while(!glfwWindowShouldClose(window) && stillRunning)
@@ -110,7 +110,7 @@ int main(void)
 		glm::mat4 projection;
 		projection = glm::perspective(glm::radians(camera.Fov), (GLfloat)width / (GLfloat)width, 0.1f, 100.0f);
 
-		thunderbirdObject.Draw(textureShader, view, projection);
+		tankBodyObject.Draw(celShader, view, projection);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
