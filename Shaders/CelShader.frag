@@ -19,14 +19,30 @@ void main()
     vec3 normals = normalize(normalVec);
     vec3 lightDirection = normalize(lightPos - fragPos);
 
-    float diffInt = max(dot(normals, lightDirection), 0.0);
-    vec4 diffuseLight = diffInt * lightColour;
+	const float stepA = 0.1;
+	const float stepB = 0.3;
+	const float stepC = 0.6;
+	const float stepD = 1.0;
+	
+    float diffFactor = max(dot(normals, lightDirection), 0.0);
+	if(diffFactor < stepA)
+		diffFactor = 0.0;
+	else if(diffFactor < stepB)
+		diffFactor = stepB;
+	else if(diffFactor < stepC)
+		diffFactor = stepC;
+	else
+		diffFactor = stepD;
+    vec4 diffuseLight = diffFactor * lightColour;
 
     float specularStrength = 0.5f;
     vec3 viewDirection = normalize(viewPos - fragPos);
     vec3 reflectDirection = reflect(-lightDirection, normals);
-    float specular = pow(max(dot(viewDirection, reflectDirection), 0.0), 32);
-    vec4 specularLight = specularStrength * specular * lightColour;
+    float specularFactor = pow(max(dot(viewDirection, reflectDirection), 0.0), 32);
+	if(specularFactor < 0.5)
+		specularFactor = 0.0;
+	else specularFactor = 1.0;
+    vec4 specularLight = specularStrength * specularFactor * lightColour;
 
     colour = baseColour * (ambientLight + diffuseLight + specularLight) * texture2D(ourTexture, texCoordFrag);
 }
