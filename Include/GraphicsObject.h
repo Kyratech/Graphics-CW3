@@ -8,8 +8,9 @@ class GraphicsObject
 private:
     Mesh* mesh;
     glm::vec3 worldPosition;
-    glm::quat rotation;
+
 public:
+    glm::quat rotation;
     GraphicsObject(Mesh* myMesh, glm::vec3 initialPosition, glm::quat initialRotation)
     {
         mesh = myMesh;
@@ -28,6 +29,14 @@ public:
         GLint mvpLocation = glGetUniformLocation(shader.getShaderProgram(), "MVPmatrix");
         glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(MVP));
 
+        GLint modelLocation = glGetUniformLocation(shader.getShaderProgram(), "modelMatrix");
+        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+        //Calculate the normal matrix for the vertices
+        glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
+        GLint normalMatrixLoc = glGetUniformLocation(shader.getShaderProgram(), "normalMatrix");
+        glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+
         mesh->Draw(shader);
     }
 
@@ -41,6 +50,8 @@ public:
 
         GLint modelLocation = glGetUniformLocation(shader.getShaderProgram(), "modelMatrix");
         glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+
 
         mesh->Draw(shader);
     }

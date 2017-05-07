@@ -99,7 +99,7 @@ int main(void)
 		glfwPollEvents();
 
 		/* Rendering commands */
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //Black
+		glClearColor(0.5f, 0.5f, 0.5f, 1.0f); //Black
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		/* Generate the view matrix */
@@ -109,6 +109,7 @@ int main(void)
 		glm::mat4 projection;
 		projection = glm::perspective(glm::radians(camera.Fov), (GLfloat)width / (GLfloat)width, 0.1f, 100.0f);
 
+		duskTank.RotateTurret(deltaTime);
 		duskTank.Draw(celShader, view, projection);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

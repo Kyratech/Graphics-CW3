@@ -48,8 +48,21 @@ public:
         GLint mvpLocation = glGetUniformLocation(shader.getShaderProgram(), "MVPmatrix");
         glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(MVP));
 
+        GLint modelLocation = glGetUniformLocation(shader.getShaderProgram(), "modelMatrix");
+        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+        //Calculate the normal matrix for the vertices
+        glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
+        GLint normalMatrixLoc = glGetUniformLocation(shader.getShaderProgram(), "normalMatrix");
+        glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+
         tankBodyMesh->Draw(shader);
-        turret->Draw(shader, view, projection);
+        turret->Draw(shader, view, projection, worldPosition, rotation);
+    }
+
+    void RotateTurret(float angle)
+    {
+        turret->rotateTurret(angle);
     }
 
 };
