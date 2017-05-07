@@ -10,6 +10,7 @@
 #include "../Include/LineArray.h"
 #include "../Include/GraphicsObject.h"
 #include "../Include/OBJMesh.h"
+#include "../Include/tank/TankObject.h"
 
 /* Screen parameters */
 const int width = 800;
@@ -84,10 +85,8 @@ int main(void)
 	Shader celShader("Shaders/CelShader.vert", "Shaders/CelShader.frag");
 	celShader.Use();
 
-    /* Load in a obj file */
-    GLfloat white[3] = {1.0f, 1.0f, 1.0f};
-    OBJMesh tankBodyMesh("Models/DuelTank_body_smooth.obj", "Images/DuelTank_body.png", white);
-    GraphicsObject tankBodyObject(&tankBodyMesh, glm::vec3(0.0f), glm::quat());
+    /* Create the first tank */
+    TankObject duskTank("Images/DuelTank_Body.png", "Images/DuelTank_Turret.png", "Images/DuelTank_Gun.png", glm::vec3(0.0f), glm::quat());
 
 	/* Main loop */
 	while(!glfwWindowShouldClose(window) && stillRunning)
@@ -110,7 +109,7 @@ int main(void)
 		glm::mat4 projection;
 		projection = glm::perspective(glm::radians(camera.Fov), (GLfloat)width / (GLfloat)width, 0.1f, 100.0f);
 
-		tankBodyObject.Draw(celShader, view, projection);
+		duskTank.Draw(celShader, view, projection);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

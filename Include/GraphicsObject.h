@@ -5,11 +5,11 @@
 
 class GraphicsObject
 {
-public:
+private:
     Mesh* mesh;
     glm::vec3 worldPosition;
     glm::quat rotation;
-
+public:
     GraphicsObject(Mesh* myMesh, glm::vec3 initialPosition, glm::quat initialRotation)
     {
         mesh = myMesh;
@@ -17,7 +17,7 @@ public:
         rotation = initialRotation;
     }
 
-    void Draw(Shader shader, glm::mat4 view, glm::mat4 projection)
+    virtual void Draw(Shader shader, glm::mat4 view, glm::mat4 projection)
     {
         glm::mat4 model;
         model = glm::translate(model, this->worldPosition);
