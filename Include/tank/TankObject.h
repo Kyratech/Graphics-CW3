@@ -19,8 +19,8 @@ public:
     {
         GLfloat white[3] = {1.0f, 1.0f, 1.0f};
         tankBodyMesh = new OBJMesh("Models/DuelTank_body_smooth.obj", bodyTex.c_str(), white);
-        tankTurretMesh = new OBJMesh("Models/DuelTank_Turret_smooth.obj", turretTex.c_str(), white);
-        tankCannonMesh = new OBJMesh("Models/DuelTank_Cannon_smooth.obj", cannonTex.c_str(), white);
+        tankTurretMesh = new OBJMesh("Models/DuelTank_Turret_smooth_moved.obj", turretTex.c_str(), white);
+        tankCannonMesh = new OBJMesh("Models/DuelTank_Cannon_smooth_moved.obj", cannonTex.c_str(), white);
 
         CannonObject* cannon = new CannonObject(tankCannonMesh);
         turret = new TurretObject(tankTurretMesh, cannon);
@@ -57,12 +57,27 @@ public:
         glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 
         tankBodyMesh->Draw(shader);
-        turret->Draw(shader, view, projection, worldPosition, rotation);
+        turret->Draw(shader, view, projection, model);
+    }
+
+    void Translate(glm::vec3 translation)
+    {
+        worldPosition = worldPosition + translation;
+    }
+
+    void Rotate(glm::quat deltaRotation)
+    {
+        rotation = deltaRotation * rotation;
     }
 
     void RotateTurret(float angle)
     {
-        turret->rotateTurret(angle);
+        turret->RotateTurret(angle);
+    }
+
+    void RotateCannon(float angle)
+    {
+        turret->RotateCannon(angle);
     }
 
 };

@@ -109,7 +109,9 @@ int main(void)
 		glm::mat4 projection;
 		projection = glm::perspective(glm::radians(camera.Fov), (GLfloat)width / (GLfloat)width, 0.1f, 100.0f);
 
+		duskTank.Rotate(glm::angleAxis(deltaTime * 0.3f, glm::vec3(0.0f, 1.0f, 0.0f)));
 		duskTank.RotateTurret(deltaTime);
+		duskTank.RotateCannon(deltaTime * 0.5f);
 		duskTank.Draw(celShader, view, projection);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

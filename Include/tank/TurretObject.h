@@ -14,7 +14,7 @@ private:
 public:
     TurretObject(Mesh* myMesh, CannonObject* cannonObj)
     {
-        turretPosition = glm::vec3(0.0f);
+        turretPosition = glm::vec3(0.0f, 0.8, -3.0f);
         turretRotation = glm::quat();
 
         mesh = myMesh;
@@ -26,34 +26,37 @@ public:
         delete cannon;
     }
 
-    void Draw(Shader shader, glm::mat4 view, glm::mat4 projection, glm::vec3 tankPos, glm::quat tankRot)
+    void Draw(Shader shader, glm::mat4 view, glm::mat4 projection, glm::mat4 tankModelMatrix)
     {
-        glm::mat4 model;
-        model = glm::translate(model, tankPos + turretPosition);
-        glm::quat combinedRotation = turretRotation * tankRot;
-        model = glm::rotate(model, glm::angle(combinedRotation), glm::axis(combinedRotation));
+        tankModelMatrix = glm::translate(tankModelMatrix, turretPosition);
+        tankModelMatrix = glm::rotate(tankModelMatrix, glm::angle(turretRotation), glm::axis(turretRotation));
 
-        glm::mat4 MVP = projection * view * model;
+        glm::mat4 MVP = projection * view * tankModelMatrix;
 
         GLint mvpLocation = glGetUniformLocation(shader.getShaderProgram(), "MVPmatrix");
         glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(MVP));
 
         GLint modelLocation = glGetUniformLocation(shader.getShaderProgram(), "modelMatrix");
-        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(tankModelMatrix));
 
         //Calculate the normal matrix for the vertices
-        glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
+        glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(tankModelMatrix)));
         GLint normalMatrixLoc = glGetUniformLocation(shader.getShaderProgram(), "normalMatrix");
         glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 
 
         mesh->Draw(shader);
-        cannon->Draw(shader, view, projection, turretPosition, turretRotation);
+        cannon->Draw(shader, view, projection, tankModelMatrix);
     }
 
-    void rotateTurret(float angle)
+    void RotateTurret(float angle)
     {
         turretRotation = glm::angleAxis(angle, glm::vec3(0.0f, 1.0f, 0.0f)) * turretRotation;
+    }
+
+    void RotateCannon(float angle)
+    {
+        cannon->RotateCannon(angle);
     }
 };
 

@@ -13,34 +13,39 @@ private:
 public:
     CannonObject(Mesh* myMesh)
     {
-        cannonPosition = glm::vec3(0.0f);
+        cannonPosition = glm::vec3(0.2f, 0.2f, 1.0f);
         cannonRotation = glm::quat();
 
         mesh = myMesh;
     }
 
-    void Draw(Shader shader, glm::mat4 view, glm::mat4 projection, glm::vec3 turretPos, glm::quat turretRot)
+    void Draw(Shader shader, glm::mat4 view, glm::mat4 projection, glm::mat4 turretModelMatrix)
     {
-        glm::mat4 model;
-        model = glm::translate(model, cannonPosition + turretPos);
-        glm::quat compoundRotation = cannonRotation * turretRot;
-        model = glm::rotate(model, glm::angle(compoundRotation), glm::axis(compoundRotation));
+        //glm::mat4 model;
 
-        glm::mat4 MVP = projection * view * model;
+        turretModelMatrix = glm::translate(turretModelMatrix, cannonPosition);
+        turretModelMatrix = glm::rotate(turretModelMatrix, glm::angle(cannonRotation), glm::axis(cannonRotation));
+
+        glm::mat4 MVP = projection * view * turretModelMatrix;
 
         GLint mvpLocation = glGetUniformLocation(shader.getShaderProgram(), "MVPmatrix");
         glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(MVP));
 
         GLint modelLocation = glGetUniformLocation(shader.getShaderProgram(), "modelMatrix");
-        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(turretModelMatrix));
 
         //Calculate the normal matrix for the vertices
-        glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
+        glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(turretModelMatrix)));
         GLint normalMatrixLoc = glGetUniformLocation(shader.getShaderProgram(), "normalMatrix");
         glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 
 
         mesh->Draw(shader);
+    }
+
+    void RotateCannon(float angle)
+    {
+        cannonRotation = glm::angleAxis(angle, glm::vec3(1.0f, 0.0f, 0.0f)) * cannonRotation;
     }
 };
 
