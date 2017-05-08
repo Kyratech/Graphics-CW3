@@ -9,11 +9,9 @@ class OBJMesh :public Mesh
 {
 public:
     /* Constructor */
-    OBJMesh(const GLchar* objPath, const GLchar* texturePath, GLfloat colour[3])
+    OBJMesh(const GLchar* objPath, const struct Material myMaterial)
     {
-        r = colour[0];
-        g = colour[1];
-        b = colour[2];
+        material = myMaterial;
 
         /* TinyOBJ setup*/
         tinyobj::attrib_t attrib;
@@ -90,8 +88,8 @@ public:
         glBindVertexArray(0);
 
         //Generate the texture
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glGenTextures(1, &diffuse);
+        glBindTexture(GL_TEXTURE_2D, diffuse);
 
         //Set the wrapping style to repeat (This is on by default, but the code is here for completeness)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -103,18 +101,18 @@ public:
 
         //Load in the texture
         int width, height, n;
-        unsigned char* image = stbi_load(texturePath, &width, &height, &n, 3);
+        unsigned char* image = stbi_load(material.diffuse.c_str(), &width, &height, &n, 3);
         if(image != NULL)
         {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
             glGenerateMipmap(GL_TEXTURE_2D);
-            std::cout << "Loaded texture at: " << texturePath << std::endl;
+            std::cout << "Loaded texture at: " << material.diffuse << std::endl;
             std::cout << "Image stats: " << width << ", " << height << ", " << n << std::endl;
             std::cout << "First four bytes: " << (int)image[0] << ", " << (int)image[1] << ", " << (int)image[2] << ", " << (int)image[3] << std::endl;
         }
         else
         {
-            std::cout << "Failed to load texture at: " << texturePath << std::endl;
+            std::cout << "Failed to load texture at: " << material.diffuse << std::endl;
         }
         //Clean-up
         stbi_image_free(image);
@@ -123,22 +121,27 @@ public:
 
     void Draw(Shader shader)
     {
-        GLint colourLocation = glGetUniformLocation(shader.getShaderProgram(), "baseColour");
-        glUniform4f(colourLocation, r, g, b, 1.0f);
+        GLint lightPositionLocation = glGetUniformLocation(shader.getShaderProgram(), "light.position");
+        GLint lightAmbientLocation = glGetUniformLocation(shader.getShaderProgram(), "light.ambient");
+        GLint lightDiffuseLocation = glGetUniformLocation(shader.getShaderProgram(), "light.diffuse");
+        GLint lightSpecularLocation = glGetUniformLocation(shader.getShaderProgram(), "light.specular");
 
-        //Lighting colour
-        GLint lightColourLocation = glGetUniformLocation(shader.getShaderProgram(), "lightColour");
-        glUniform4f(lightColourLocation, LIGHT_COLOUR.x, LIGHT_COLOUR.y, LIGHT_COLOUR.z, 1.0f);
-        //Lighting position
-        GLint lightPositionLocation = glGetUniformLocation(shader.getShaderProgram(), "lightPos");
         glUniform3f(lightPositionLocation, LIGHT_POS.x, LIGHT_POS.y, LIGHT_POS.z);
+        glUniform3f(lightAmbientLocation, 0.2f, 0.2f, 0.2f);
+        glUniform3f(lightDiffuseLocation, 0.5f, 0.5f, 0.5f);
+        glUniform3f(lightSpecularLocation, 1.0f, 1.0f, 1.0f);
 
         GLint viewPosLocation = glGetUniformLocation(shader.getShaderProgram(), "viewPos");
         glUniform3f(viewPosLocation, camera.GetCameraPosition().x, camera.GetCameraPosition().y, camera.GetCameraPosition().z);
 
+        GLint matSpecularLocation = glGetUniformLocation(shader.getShaderProgram(), "material.specular");
+        GLint matShineLocation    = glGetUniformLocation(shader.getShaderProgram(), "material.shininess");
+        glUniform3f(matSpecularLocation, material.specular.x, material.specular.y, material.specular.z);
+        glUniform1f(matShineLocation, material.shininess);
+
         glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glUniform1i(glGetUniformLocation(shader.getShaderProgram(), "ourTexture"), 0);
+		glBindTexture(GL_TEXTURE_2D, diffuse);
+		glUniform1i(glGetUniformLocation(shader.getShaderProgram(), "material.diffuse"), 0);
 
 		glBindVertexArray(this->VAO);
         glDrawArrays(GL_TRIANGLES, 0, vertexCount);
@@ -146,9 +149,9 @@ public:
     }
 
 private:
-    GLuint VAO, VBO, texture;
+    Material material;
+    GLuint VAO, VBO, diffuse;
     int vertexCount;
-    GLfloat r,g,b;
     glm::vec3 fragmentColour;
 };
 

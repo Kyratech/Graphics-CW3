@@ -1,23 +1,36 @@
 #version 400 core
+struct Material
+{
+	sampler2D diffuse;
+	vec3 specular;
+	float shininess;
+};
+
+struct Light
+{
+	vec3 position;
+	
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+};
+
 in vec2 texCoordFrag;
 in vec3 fragPos;
 in vec3 normalVec;
 
 out vec4 colour;
 
-uniform vec4 baseColour;
-uniform vec4 lightColour;
-uniform vec3 lightPos;
 uniform vec3 viewPos;
-uniform sampler2D ourTexture;
+uniform Material material;
+uniform Light light;
 
 void main()
 {
-	float ambientStrength = 0.4f;
-    vec4 ambientLight = ambientStrength * lightColour;
+    vec3 ambientLight = vec3(texture2D(material.diffuse, texCoordFrag)) * light.ambient;
 
     vec3 normals = normalize(normalVec);
-    vec3 lightDirection = normalize(lightPos - fragPos);
+    vec3 lightDirection = normalize(light.position - fragPos);
 
 	const float stepA = 0.1;
 	const float stepB = 0.3;
@@ -33,16 +46,16 @@ void main()
 		diffFactor = stepC;
 	else
 		diffFactor = stepD;
-    vec4 diffuseLight = diffFactor * lightColour;
+    vec3 diffuseLight = diffFactor * vec3(texture2D(material.diffuse, texCoordFrag)) * light.diffuse;
 
-    float specularStrength = 0.5f;
     vec3 viewDirection = normalize(viewPos - fragPos);
     vec3 reflectDirection = reflect(-lightDirection, normals);
-    float specularFactor = pow(max(dot(viewDirection, reflectDirection), 0.0), 32);
+    float specularFactor = pow(max(dot(viewDirection, reflectDirection), 0.0), material.shininess);
 	if(specularFactor < 0.5)
 		specularFactor = 0.0;
 	else specularFactor = 1.0;
-    vec4 specularLight = specularStrength * specularFactor * lightColour;
+    vec3 specularLight = specularFactor * material.specular * light.specular;
 
-    colour = baseColour * (ambientLight + diffuseLight + specularLight) * texture2D(ourTexture, texCoordFrag);
+	vec3 result = ambientLight + diffuseLight + specularLight;
+    colour = vec4(result, 1.0f);
 }

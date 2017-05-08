@@ -25,6 +25,13 @@ struct Vertex
     GLfloat textureCoords[2];
 };
 
+struct Material
+{
+    std::string diffuse;
+    glm::vec3 specular;
+    float shininess;
+};
+
 /* Set up the camera */
 glm::vec3 cameraPos = glm::vec3(0.0f, 10.0f, 0.0f);
 

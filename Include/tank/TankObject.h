@@ -17,10 +17,12 @@ private:
 public:
     TankObject(std::string bodyTex, std::string turretTex, std::string cannonTex, glm::vec3 initialPos, glm::quat initialRotation)
     {
-        GLfloat white[3] = {1.0f, 1.0f, 1.0f};
-        tankBodyMesh = new OBJMesh("Models/DuelTank_body_smooth.obj", bodyTex.c_str(), white);
-        tankTurretMesh = new OBJMesh("Models/DuelTank_Turret_smooth_moved.obj", turretTex.c_str(), white);
-        tankCannonMesh = new OBJMesh("Models/DuelTank_Cannon_smooth_moved.obj", cannonTex.c_str(), white);
+        const struct Material bodyMat = {bodyTex, glm::vec3(0.5f, 0.5f, 0.5f), 64.0f};
+        const struct Material turretMat = {turretTex, glm::vec3(0.5f, 0.5f, 0.5f), 64.0f};
+        const struct Material cannonMat = {cannonTex, glm::vec3(0.5f, 0.5f, 0.5f), 64.0f};
+        tankBodyMesh = new OBJMesh("Models/DuelTank_body_smooth.obj", bodyMat);
+        tankTurretMesh = new OBJMesh("Models/DuelTank_Turret_smooth_moved.obj", turretMat);
+        tankCannonMesh = new OBJMesh("Models/DuelTank_Cannon_smooth_moved.obj", cannonMat);
 
         CannonObject* cannon = new CannonObject(tankCannonMesh);
         turret = new TurretObject(tankTurretMesh, cannon);
