@@ -2,7 +2,7 @@
 struct Material
 {
 	sampler2D diffuse;
-	vec3 specular;
+	sampler2D specular;
 	float shininess;
 };
 
@@ -54,7 +54,7 @@ void main()
 	if(specularFactor < 0.5)
 		specularFactor = 0.0;
 	else specularFactor = 1.0;
-    vec3 specularLight = specularFactor * material.specular * light.specular;
+    vec3 specularLight = specularFactor * vec3(texture2D(material.specular, texCoordFrag)) * light.specular;
 
 	vec3 result = ambientLight + diffuseLight + specularLight;
     colour = vec4(result, 1.0f);

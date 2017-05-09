@@ -86,7 +86,7 @@ int main(void)
 	celShader.Use();
 
     /* Create the first tank */
-    TankObject duskTank("Images/DuelTank_Body.png", "Images/DuelTank_Turret.png", "Images/DuelTank_Gun.png", glm::vec3(0.0f), glm::quat());
+    TankObject duskTank("Images/DuelTankBody", "Images/DuelTankTurret", "Images/DuelTankGun", glm::vec3(0.0f), glm::quat());
 
 	/* Main loop */
 	while(!glfwWindowShouldClose(window) && stillRunning)
@@ -107,7 +107,7 @@ int main(void)
 		view = camera.GetViewMatrix();
 		/* Generate the projection matrix */
 		glm::mat4 projection;
-		projection = glm::perspective(glm::radians(camera.Fov), (GLfloat)width / (GLfloat)width, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(camera.Fov), (GLfloat)width / (GLfloat)height, 0.1f, 100.0f);
 
 		duskTank.Rotate(glm::angleAxis(deltaTime * 0.3f, glm::vec3(0.0f, 1.0f, 0.0f)));
 		duskTank.RotateTurret(deltaTime);

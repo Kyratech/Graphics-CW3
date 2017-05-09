@@ -28,7 +28,7 @@ struct Vertex
 struct Material
 {
     std::string diffuse;
-    glm::vec3 specular;
+    std::string specular;
     float shininess;
 };
 

@@ -44,3 +44,6 @@
 #Specific files not part of the project
 include/include/*
 lib/*
+
+#However, we want the wavefront objs in the model folder
+!Models/*.obj
