@@ -117,9 +117,17 @@ vec3 calculateSpotLight(SpotLight light, vec3 normals)
 {
 	vec3 lightDirection = normalize(light.position - fragPos);
 	float theta = dot(lightDirection, normalize(-light.direction));
-	float epsilon   = light.cutoff - light.outerCutoff;
-	float intensity = clamp((theta - light.outerCutoff) / epsilon, 0.0, 1.0);    
 	   
+	float intensity = 0.0;
+	if(theta > light.outerCutoff && theta <= light.cutoff)
+	{
+		intensity = 0.5f;
+	}
+	if(theta > light.cutoff) 
+	{       
+		intensity = 1.0f;
+	}
+  
 	vec3 ambientLight = celAmbient(light.ambient);
 	vec3 diffuseLight = celDiffuse(normals, lightDirection, light.diffuse) * intensity;
 	vec3 specularLight = celSpecular(normals, lightDirection, light.specular) * intensity;

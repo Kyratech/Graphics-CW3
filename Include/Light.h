@@ -78,8 +78,6 @@ public:
         GLint lightDiffuseLocation = glGetUniformLocation(shader.getShaderProgram(), ("pointLights[" + id + "].diffuse").c_str());
         GLint lightSpecularLocation = glGetUniformLocation(shader.getShaderProgram(), ("pointLights[" + id + "].specular").c_str());
 
-        std::cout << "Sending data to: " << ("pointLights[" + id + "].position").c_str() << std::endl;
-
         glUniform3fv(lightPositionLocation, 1, glm::value_ptr(lightPosition));
         glUniform1f(constantComponentLocation, constantComponent);
         glUniform1f(linearComponentLocation, linearComponent);
