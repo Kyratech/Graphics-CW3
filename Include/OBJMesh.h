@@ -136,8 +136,9 @@ public:
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    void Draw(Shader shader)
+    void Draw(Shader shader, const std::vector<LightSource*> &lights)
     {
+        /*
         GLint lightPositionLocation = glGetUniformLocation(shader.getShaderProgram(), "light.position");
         GLint lightAmbientLocation = glGetUniformLocation(shader.getShaderProgram(), "light.ambient");
         GLint lightDiffuseLocation = glGetUniformLocation(shader.getShaderProgram(), "light.diffuse");
@@ -147,6 +148,15 @@ public:
         glUniform3f(lightAmbientLocation, 0.2f, 0.2f, 0.2f);
         glUniform3f(lightDiffuseLocation, 0.8f, 0.8f, 0.8f);
         glUniform3f(lightSpecularLocation, 1.0f, 1.0f, 1.0f);
+        glUniform1f(glGetUniformLocation(shader.getShaderProgram(), "light.constant"),  1.0f);
+        glUniform1f(glGetUniformLocation(shader.getShaderProgram(), "light.linear"),    0.09);
+        glUniform1f(glGetUniformLocation(shader.getShaderProgram(), "light.quadratic"), 0.032);
+        */
+
+        for(int i = 0; i < lights.size(); i++)
+        {
+            lights[i]->ApplyLighting(shader);
+        }
 
         GLint viewPosLocation = glGetUniformLocation(shader.getShaderProgram(), "viewPos");
         glUniform3f(viewPosLocation, camera.GetCameraPosition().x, camera.GetCameraPosition().y, camera.GetCameraPosition().z);

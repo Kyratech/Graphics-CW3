@@ -9,7 +9,7 @@ class Mesh
 {
 public:
     /* Draw the mesh with the supplied texture */
-    virtual void Draw(Shader shader) = 0;
+    virtual void Draw(Shader shader, const std::vector<LightSource*> &lights) = 0;
 };
 
 #endif // MESH_H

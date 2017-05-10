@@ -18,7 +18,7 @@ public:
         rotation = initialRotation;
     }
 
-    virtual void Draw(Shader shader, glm::mat4 view, glm::mat4 projection)
+    virtual void Draw(Shader shader, glm::mat4 view, glm::mat4 projection, const std::vector<LightSource*> &lights)
     {
         glm::mat4 model;
         model = glm::translate(model, this->worldPosition);
@@ -37,11 +37,11 @@ public:
         GLint normalMatrixLoc = glGetUniformLocation(shader.getShaderProgram(), "normalMatrix");
         glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 
-        mesh->Draw(shader);
+        mesh->Draw(shader, lights);
     }
 
     /* Alternative version of Draw takes the transform of the object directly */
-    void Draw(Shader shader, glm::mat4 model, glm::mat4 view, glm::mat4 projection)
+    void Draw(Shader shader, glm::mat4 model, glm::mat4 view, glm::mat4 projection, const std::vector<LightSource*> &lights)
     {
         glm::mat4 MVP = projection * view * model;
 
@@ -53,7 +53,7 @@ public:
 
 
 
-        mesh->Draw(shader);
+        mesh->Draw(shader, lights);
     }
 
     void setPostion(glm::vec3 newPos)

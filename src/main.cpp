@@ -12,6 +12,7 @@
 #include "../Include/OBJMesh.h"
 #include "../Include/tank/TankObject.h"
 
+
 /* Screen parameters */
 const int width = 800;
 const int height = 450;
@@ -88,6 +89,13 @@ int main(void)
     /* Create the first tank */
     TankObject duskTank("Images/DuelTankBody", "Images/DuelTankTurret", "Images/DuelTankGun", glm::vec3(0.0f), glm::quat());
 
+    /* Create some lights */
+    std::vector<LightSource*> lights;
+    DirectionalLight sun(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.2f), glm::vec3(0.5f), glm::vec3(1.0f));
+    PointLight defaultPoint(LIGHT_POS, 1.0, 0.09, 0.032, 0, glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
+    lights.push_back(&sun);
+    lights.push_back(&defaultPoint);
+
 	/* Main loop */
 	while(!glfwWindowShouldClose(window) && stillRunning)
 	{
@@ -109,10 +117,9 @@ int main(void)
 		glm::mat4 projection;
 		projection = glm::perspective(glm::radians(camera.Fov), (GLfloat)width / (GLfloat)height, 0.1f, 100.0f);
 
-		duskTank.Rotate(glm::angleAxis(deltaTime * 0.3f, glm::vec3(0.0f, 1.0f, 0.0f)));
+		//duskTank.Rotate(glm::angleAxis(deltaTime * 0.3f, glm::vec3(0.0f, 1.0f, 0.0f)));
 		duskTank.RotateTurret(deltaTime);
-		duskTank.RotateCannon(deltaTime * 0.5f);
-		duskTank.Draw(celShader, view, projection);
+		duskTank.Draw(celShader, view, projection, lights);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

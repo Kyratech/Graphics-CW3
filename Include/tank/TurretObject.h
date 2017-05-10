@@ -26,7 +26,7 @@ public:
         delete cannon;
     }
 
-    void Draw(Shader shader, glm::mat4 view, glm::mat4 projection, glm::mat4 tankModelMatrix)
+    void Draw(Shader shader, glm::mat4 view, glm::mat4 projection, glm::mat4 tankModelMatrix, const std::vector<LightSource*> &lights)
     {
         tankModelMatrix = glm::translate(tankModelMatrix, turretPosition);
         tankModelMatrix = glm::rotate(tankModelMatrix, glm::angle(turretRotation), glm::axis(turretRotation));
@@ -45,8 +45,8 @@ public:
         glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 
 
-        mesh->Draw(shader);
-        cannon->Draw(shader, view, projection, tankModelMatrix);
+        mesh->Draw(shader, lights);
+        cannon->Draw(shader, view, projection, tankModelMatrix, lights);
     }
 
     void RotateTurret(float angle)

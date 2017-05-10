@@ -19,7 +19,7 @@ public:
         mesh = myMesh;
     }
 
-    void Draw(Shader shader, glm::mat4 view, glm::mat4 projection, glm::mat4 turretModelMatrix)
+    void Draw(Shader shader, glm::mat4 view, glm::mat4 projection, glm::mat4 turretModelMatrix, const std::vector<LightSource*> &lights)
     {
         //glm::mat4 model;
 
@@ -40,7 +40,7 @@ public:
         glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 
 
-        mesh->Draw(shader);
+        mesh->Draw(shader, lights);
     }
 
     void RotateCannon(float angle)

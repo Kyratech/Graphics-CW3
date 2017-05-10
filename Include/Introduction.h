@@ -10,6 +10,7 @@
 
 #include "ShaderLoader.h"
 #include "BLCamera.h"
+#include "Light.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
