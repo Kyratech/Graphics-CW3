@@ -93,8 +93,10 @@ int main(void)
     std::vector<LightSource*> lights;
     DirectionalLight sun(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.2f), glm::vec3(0.5f), glm::vec3(1.0f));
     PointLight defaultPoint(LIGHT_POS, 1.0, 0.09, 0.032, 0, glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
+    SpotLight spotLight(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
     lights.push_back(&sun);
     lights.push_back(&defaultPoint);
+    lights.push_back(&spotLight);
 
 	/* Main loop */
 	while(!glfwWindowShouldClose(window) && stillRunning)
