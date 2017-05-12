@@ -63,16 +63,12 @@ vec3 celDiffuse(vec3 normals, vec3 lightDirection, vec3 diffuseInput)
 {
 	const float stepA = 0.1;
 	const float stepB = 0.3;
-	const float stepC = 0.6;
+	const float stepC = 0.5;
 	const float stepD = 1.0;
 	
     float diffFactor = max(dot(normals, lightDirection), 0.0);
-	if(diffFactor < stepA)
+	if(diffFactor < 0.5)
 		diffFactor = 0.0;
-	else if(diffFactor < stepB)
-		diffFactor = stepB;
-	else if(diffFactor < stepC)
-		diffFactor = stepC;
 	else
 		diffFactor = stepD;
     return (diffFactor * vec3(texture2D(material.diffuse, texCoordFrag)) * diffuseInput);
