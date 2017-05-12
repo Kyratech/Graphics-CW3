@@ -91,9 +91,13 @@ int main(void)
     /* Create the first tank */
     TankObject duskTank("Images/DuelTankBody", "Images/DuelTankTurret", "Images/DuelTankGun", glm::vec3(0.0f), glm::quat());
 
+    const struct Material rock1Mat = {"Images/Rock/Rock1_DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png", 8.0f};
+    OBJMesh rock1Mesh("Models/Rock1.obj", rock1Mat);
+    GraphicsObject RockObject(&rock1Mesh, glm::vec3(5.0f, 0.0f, 5.0f), glm::quat());
+
     /* Create some lights */
     std::vector<LightSource*> lights;
-    DirectionalLight sun(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.2f), glm::vec3(0.5f), glm::vec3(1.0f));
+    DirectionalLight sun(glm::vec3(-0.5f, -1.0f, -0.5f), glm::vec3(0.2f), glm::vec3(0.5f), glm::vec3(1.0f));
     PointLight defaultPoint(LIGHT_POS, 1.0, 0.09, 0.032, 0, glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
     SpotLight spotLight(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
     lights.push_back(&sun);
@@ -124,6 +128,7 @@ int main(void)
 		celShader.Use();
 		duskTank.RotateTurret(deltaTime);
 		duskTank.Draw(celShader, view, projection, lights);
+		RockObject.Draw(celShader, view, projection, lights);
 
 		//Draw the skybox last
 		skyboxShader.Use();

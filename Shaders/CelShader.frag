@@ -67,7 +67,7 @@ vec3 celDiffuse(vec3 normals, vec3 lightDirection, vec3 diffuseInput)
 	const float stepD = 1.0;
 	
     float diffFactor = max(dot(normals, lightDirection), 0.0);
-	if(diffFactor < 0.5)
+	if(diffFactor < 0.3)
 		diffFactor = 0.0;
 	else
 		diffFactor = stepD;
