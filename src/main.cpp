@@ -11,7 +11,7 @@
 #include "../Include/GraphicsObject.h"
 #include "../Include/OBJMesh.h"
 #include "../Include/tank/TankObject.h"
-
+#include "../Include/Skybox.h"
 
 /* Screen parameters */
 const int width = 800;
@@ -82,9 +82,11 @@ int main(void)
 	/* Turn on depth testing to make stuff in front actually look like it's in front. */
 	glEnable(GL_DEPTH_TEST);
 
-    /* Load the shader program */
+    /* Load the shader programs */
 	Shader celShader("Shaders/CelShader.vert", "Shaders/CelShader.frag");
-	celShader.Use();
+	Shader skyboxShader("Shaders/SkyboxShader.vert", "Shaders/SkyboxShader.frag");
+
+	Skybox sky("Images/mp_tf/mp_tf/thefog");
 
     /* Create the first tank */
     TankObject duskTank("Images/DuelTankBody", "Images/DuelTankTurret", "Images/DuelTankGun", glm::vec3(0.0f), glm::quat());
@@ -119,9 +121,13 @@ int main(void)
 		glm::mat4 projection;
 		projection = glm::perspective(glm::radians(camera.Fov), (GLfloat)width / (GLfloat)height, 0.1f, 100.0f);
 
-		//duskTank.Rotate(glm::angleAxis(deltaTime * 0.3f, glm::vec3(0.0f, 1.0f, 0.0f)));
+		celShader.Use();
 		duskTank.RotateTurret(deltaTime);
 		duskTank.Draw(celShader, view, projection, lights);
+
+		//Draw the skybox last
+		skyboxShader.Use();
+		sky.Draw(skyboxShader, view, projection);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
