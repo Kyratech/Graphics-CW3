@@ -95,6 +95,10 @@ int main(void)
     OBJMesh rock1Mesh("Models/Rock1.obj", rock1Mat);
     GraphicsObject RockObject(&rock1Mesh, glm::vec3(5.0f, 0.0f, 5.0f), glm::quat());
 
+    const struct Material floatingIsland1Mat = {"Images/Rock/FloatingIsland1DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png", 8.0f};
+    OBJMesh floatingIsland1Mesh("Models/FloatingIsland1.obj", floatingIsland1Mat);
+    GraphicsObject floatingIslandObject(&floatingIsland1Mesh, glm::vec3(0.0f, -5.0f, 0.0f), glm::quat(), 2.0f);
+
     /* Create some lights */
     std::vector<LightSource*> lights;
     DirectionalLight sun(glm::vec3(-0.5f, -1.0f, -0.5f), glm::vec3(0.2f), glm::vec3(0.5f), glm::vec3(1.0f));
@@ -129,6 +133,7 @@ int main(void)
 		duskTank.RotateTurret(deltaTime);
 		duskTank.Draw(celShader, view, projection, lights);
 		RockObject.Draw(celShader, view, projection, lights);
+		floatingIslandObject.Draw(celShader, view, projection, lights);
 
 		//Draw the skybox last
 		skyboxShader.Use();

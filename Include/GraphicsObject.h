@@ -8,7 +8,7 @@ class GraphicsObject
 private:
     Mesh* mesh;
     glm::vec3 worldPosition;
-
+    float scale;
 public:
     glm::quat rotation;
     GraphicsObject(Mesh* myMesh, glm::vec3 initialPosition, glm::quat initialRotation)
@@ -16,6 +16,15 @@ public:
         mesh = myMesh;
         worldPosition = initialPosition;
         rotation = initialRotation;
+        scale = 1.0f;
+    }
+
+    GraphicsObject(Mesh* myMesh, glm::vec3 initialPosition, glm::quat initialRotation, float meshScale)
+    {
+        mesh = myMesh;
+        worldPosition = initialPosition;
+        rotation = initialRotation;
+        scale = meshScale;
     }
 
     virtual void Draw(Shader shader, glm::mat4 view, glm::mat4 projection, const std::vector<LightSource*> &lights)
@@ -23,6 +32,7 @@ public:
         glm::mat4 model;
         model = glm::translate(model, this->worldPosition);
         model = glm::rotate(model, glm::angle(rotation), glm::axis(rotation));
+        model = glm::scale(model, glm::vec3(scale));
 
         glm::mat4 MVP = projection * view * model;
 
