@@ -34,8 +34,6 @@ struct Material
 };
 
 /* Set up the camera */
-glm::vec3 cameraPos = glm::vec3(0.0f, 10.0f, 0.0f);
-
-ThreeD_Camera camera(cameraPos);
+extern ThreeD_Camera camera;
 
 #endif // INTRO_H

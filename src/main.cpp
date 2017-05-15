@@ -13,6 +13,9 @@
 #include "../Include/tank/TankObject.h"
 #include "../Include/Skybox.h"
 
+glm::vec3 cameraPos = glm::vec3(0.0f, 10.0f, 0.0f);
+ThreeD_Camera camera(cameraPos);
+
 /* Screen parameters */
 const int width = 800;
 const int height = 450;
