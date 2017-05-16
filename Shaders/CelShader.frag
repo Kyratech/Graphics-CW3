@@ -43,16 +43,18 @@ struct SpotLight
 in vec2 texCoordFrag;
 in vec3 fragPos;
 in vec3 normalVec;
+in vec4 lightSpaceFrag;
 
 out vec4 colour;
 
 uniform vec3 viewPos;
 uniform Material material;
+
 uniform DirLight sunLight;
 #define NR_POINT_LIGHTS 1 
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotLight;
-
+uniform sampler2D shadowMap;
 
 vec3 celAmbient(vec3 ambientInput)
 {
@@ -85,18 +87,18 @@ vec3 celSpecular(vec3 normals, vec3 lightDirection, vec3 specularInput)
     return (specularFactor * vec3(texture2D(material.specular, texCoordFrag)) * specularInput);
 }
 
-vec3 calculateDirLight(DirLight light, vec3 normals)
+vec3 calculateDirLight(DirLight light, vec3 normals, float shadows, vec3 lightDirection)
 {
-	vec3 lightDirection = normalize(-light.direction);
+	//vec3 lightDirection = normalize(-light.direction);
 	
 	vec3 ambientLight = celAmbient(light.ambient);
 	vec3 diffuseLight = celDiffuse(normals, lightDirection, light.diffuse);
 	vec3 specularLight = celSpecular(normals, lightDirection, light.specular);
 	
-	return (ambientLight + diffuseLight + specularLight);
+	return (ambientLight + shadows * (diffuseLight + specularLight));
 }
 
-vec3 calculatePointLight(PointLight light, vec3 normals)
+vec3 calculatePointLight(PointLight light, vec3 normals, float shadows)
 {
 	float distance    = length(light.position - fragPos);
 	float attenuation = 1.0f / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
@@ -106,10 +108,10 @@ vec3 calculatePointLight(PointLight light, vec3 normals)
 	vec3 diffuseLight = celDiffuse(normals, lightDirection, light.diffuse) * attenuation;
 	vec3 specularLight = celSpecular(normals, lightDirection, light.specular) * attenuation;
 	
-	return (ambientLight + diffuseLight + specularLight);
+	return (ambientLight + shadows* (diffuseLight + specularLight));
 }
 
-vec3 calculateSpotLight(SpotLight light, vec3 normals)
+vec3 calculateSpotLight(SpotLight light, vec3 normals, float shadows)
 {
 	vec3 lightDirection = normalize(light.position - fragPos);
 	float theta = dot(lightDirection, normalize(-light.direction));
@@ -128,20 +130,43 @@ vec3 calculateSpotLight(SpotLight light, vec3 normals)
 	vec3 diffuseLight = celDiffuse(normals, lightDirection, light.diffuse) * intensity;
 	vec3 specularLight = celSpecular(normals, lightDirection, light.specular) * intensity;
 		
-	return (ambientLight + diffuseLight + specularLight);
+	return (ambientLight + shadows * (diffuseLight + specularLight));
+}
+
+float calculateShadows(vec3 lightDir, vec3 normals, vec4 lightSpaceFrag)
+{
+    vec3 projCoords = lightSpaceFrag.xyz / lightSpaceFrag.w;
+	projCoords = projCoords * 0.5 + 0.5; 
+	
+	float closestDepth = texture(shadowMap, projCoords.xy).r;
+	float currentDepth = projCoords.z; 
+	
+	float bias = max(0.05 * (1.0 - dot(normals, lightDir)), 0.005); 
+	//float bias = 0.005;
+	if(currentDepth - bias > closestDepth)
+	{
+		return 0.0;
+	}
+	else
+	{
+		return 1.0;
+	}
 }
 
 void main()
 {
-    vec3 normals = normalize(normalVec);
+	vec3 normals = normalize(normalVec);
 
+	vec3 lightDirection = normalize(-sunLight.direction);
+	float shadow = calculateShadows(lightDirection, normals, lightSpaceFrag);
+	
 	vec3 result;
-	result += calculateDirLight(sunLight, normals);
+	result += calculateDirLight(sunLight, normals, shadow, lightDirection);
 
     for(int i = 0; i < NR_POINT_LIGHTS; i++)
-        result += calculatePointLight(pointLights[i], normals);
+        result += calculatePointLight(pointLights[i], normals, shadow);
 
-    result += calculateSpotLight(spotLight, normals);    
+    result += calculateSpotLight(spotLight, normals, shadow);    
     
     colour = vec4(result, 1.0);
 }

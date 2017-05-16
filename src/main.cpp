@@ -26,6 +26,8 @@ void mouse_movement(GLFWwindow *window, double xPos, double yPos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xpos, double ypos);
 
+void RenderQuad();
+
 /* Stuff to read the mouse input to move the camera */
 GLfloat lastX = width / 2.0;
 GLfloat lastY = height / 2.0;
@@ -88,23 +90,32 @@ int main(void)
     /* Load the shader programs */
 	Shader celShader("Shaders/CelShader.vert", "Shaders/CelShader.frag");
 	Shader skyboxShader("Shaders/SkyboxShader.vert", "Shaders/SkyboxShader.frag");
+	//For shadows
+	Shader depthShader("Shaders/DepthShader.vert", "Shaders/DepthShader.frag");
+	Shader debugDepthShader("Shaders/DebugDepth.vert", "Shaders/DebugDepth.frag");
 
 	Skybox sky("Images/mp_tf/mp_tf/thefog");
 
+	std::vector<CWObject*> gObjects;
+
     /* Create the first tank */
     TankObject duskTank("Images/DuelTankBody", "Images/DuelTankTurret", "Images/DuelTankGun", glm::vec3(0.0f), glm::quat());
+    gObjects.push_back(&duskTank);
 
+    /* Environment objects */
     const struct Material rock1Mat = {"Images/Rock/Rock1_DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png", 8.0f};
     OBJMesh rock1Mesh("Models/Rock1.obj", rock1Mat);
-    GraphicsObject RockObject(&rock1Mesh, glm::vec3(5.0f, 0.0f, 5.0f), glm::quat());
+    GraphicsObject rockObject(&rock1Mesh, glm::vec3(5.0f, 0.0f, 5.0f), glm::quat());
+    //gObjects.push_back(&rockObject);
 
     const struct Material floatingIsland1Mat = {"Images/Rock/FloatingIsland1DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png", 8.0f};
     OBJMesh floatingIsland1Mesh("Models/FloatingIsland1.obj", floatingIsland1Mat);
     GraphicsObject floatingIslandObject(&floatingIsland1Mesh, glm::vec3(0.0f, -5.0f, 0.0f), glm::quat(), 2.0f);
+    gObjects.push_back(&floatingIslandObject);
 
     /* Create some lights */
     std::vector<LightSource*> lights;
-    DirectionalLight sun(glm::vec3(-0.5f, -1.0f, -0.5f), glm::vec3(0.2f), glm::vec3(0.5f), glm::vec3(1.0f));
+    DirectionalLight sun(glm::vec3(-2.0f, -5.0f, -1.0f), glm::vec3(0.2f), glm::vec3(0.5f), glm::vec3(1.0f));
     PointLight defaultPoint(LIGHT_POS, 1.0, 0.09, 0.032, 0, glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
     SpotLight spotLight(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
     lights.push_back(&sun);
@@ -121,10 +132,6 @@ int main(void)
 
 		glfwPollEvents();
 
-		/* Rendering commands */
-		glClearColor(0.5f, 0.5f, 0.5f, 1.0f); //Black
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		/* Generate the view matrix */
 		glm::mat4 view;
 		view = camera.GetViewMatrix();
@@ -132,11 +139,25 @@ int main(void)
 		glm::mat4 projection;
 		projection = glm::perspective(glm::radians(camera.Fov), (GLfloat)width / (GLfloat)height, 0.1f, 100.0f);
 
-		celShader.Use();
 		duskTank.RotateTurret(deltaTime);
-		duskTank.Draw(celShader, view, projection, lights);
-		RockObject.Draw(celShader, view, projection, lights);
-		floatingIslandObject.Draw(celShader, view, projection, lights);
+
+		glm::mat4 lightSpaceMatrix = sun.CalculateShadows(depthShader, gObjects, view, projection, lights);
+
+		/* Rendering commands */
+		glViewport(0, 0, width, height);
+		glClearColor(0.5f, 0.5f, 0.5f, 1.0f); //Black
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		celShader.Use();
+
+		glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, sun.depthMap);
+		glUniform1i(glGetUniformLocation(celShader.getShaderProgram(), "shadowMap"), 2);
+
+		for(int i = 0; i < gObjects.size(); i++)
+        {
+            gObjects[i]->Draw(celShader, view, projection, lights, lightSpaceMatrix);
+        }
 
 		//Draw the skybox last
 		skyboxShader.Use();
@@ -144,12 +165,51 @@ int main(void)
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+        // Render Depth map to quad
+        debugDepthShader.Use();
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, sun.depthMap);
+        glUniform1f(glGetUniformLocation(debugDepthShader.getShaderProgram(), "depthMap"), 0);
+        //RenderQuad();
+
 		glfwSwapBuffers(window);
 	}
 
 	/* Terminate properly */
 	glfwTerminate();
 	return 0;
+}
+
+// RenderQuad() Renders a 1x1 quad in NDC, best used for framebuffer color targets
+// and post-processing effects.
+GLuint quadVAO = 0;
+GLuint quadVBO;
+void RenderQuad()
+{
+    if (quadVAO == 0)
+    {
+        GLfloat quadVertices[] = {
+            // Positions        // Texture Coords
+            -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
+             1.0f,  1.0f, 0.0f,  1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
+        };
+        // Setup plane VAO
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &quadVBO);
+        glBindVertexArray(quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+    }
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
 }
 
 /*

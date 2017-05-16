@@ -2,8 +2,9 @@
 #define TANK_OBJECT_H
 
 #include "TurretObject.h"
+#include "../CWObject.h"
 
-class TankObject
+class TankObject :public CWObject
 {
 private:
     TurretObject* turret;
@@ -39,7 +40,7 @@ public:
         delete tankCannonMesh;
     }
 
-    void Draw(Shader shader, glm::mat4 view, glm::mat4 projection, const std::vector<LightSource*> &lights)
+    void Draw(Shader shader, glm::mat4& view, glm::mat4& projection, const std::vector<LightSource*> &lights, glm::mat4& lightSpace)
     {
         glm::mat4 model;
         model = glm::translate(model, this->worldPosition);
@@ -57,6 +58,9 @@ public:
         glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
         GLint normalMatrixLoc = glGetUniformLocation(shader.getShaderProgram(), "normalMatrix");
         glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+
+        GLint lightSpaceLocation = glGetUniformLocation(shader.getShaderProgram(), "lightSpace");
+        glUniformMatrix4fv(lightSpaceLocation, 1, GL_FALSE, glm::value_ptr(lightSpace));
 
         tankBodyMesh->Draw(shader, lights);
         turret->Draw(shader, view, projection, model, lights);

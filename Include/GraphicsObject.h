@@ -1,9 +1,9 @@
 #ifndef GRAPHICS_OBJECT_H
 #define GRAPHICS_OBJECT_H
 
-#include "Introduction.h"
+#include "CWObject.h"
 
-class GraphicsObject
+class GraphicsObject :public CWObject
 {
 private:
     Mesh* mesh;
@@ -27,7 +27,7 @@ public:
         scale = meshScale;
     }
 
-    virtual void Draw(Shader shader, glm::mat4 view, glm::mat4 projection, const std::vector<LightSource*> &lights)
+    virtual void Draw(Shader shader, glm::mat4& view, glm::mat4& projection, const std::vector<LightSource*> &lights, glm::mat4& lightSpace)
     {
         glm::mat4 model;
         model = glm::translate(model, this->worldPosition);
@@ -46,6 +46,9 @@ public:
         glm::mat3 normalMatrix = glm::mat3(glm::transpose(glm::inverse(model)));
         GLint normalMatrixLoc = glGetUniformLocation(shader.getShaderProgram(), "normalMatrix");
         glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+
+        GLint lightSpaceLocation = glGetUniformLocation(shader.getShaderProgram(), "lightSpace");
+        glUniformMatrix4fv(lightSpaceLocation, 1, GL_FALSE, glm::value_ptr(lightSpace));
 
         mesh->Draw(shader, lights);
     }

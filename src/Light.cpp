@@ -1,5 +1,8 @@
 #include "../Include/Light.h"
 
+const GLuint shadowWidth = 1024;
+const GLuint shadowHeight = 1024;
+
 LightSource::LightSource(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular)
 {
     ambientComponent = ambient;
@@ -11,6 +14,24 @@ DirectionalLight::DirectionalLight(glm::vec3 direction, glm::vec3 ambient, glm::
 : LightSource(ambient, diffuse, specular)
 {
     lightDirection = direction;
+
+    //Set up shadows stuff
+    glGenFramebuffers(1, &depthMapFBO);
+
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadowWidth, shadowHeight, 0 , GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 }
 
 void DirectionalLight::ApplyLighting(Shader shader)
@@ -24,6 +45,32 @@ void DirectionalLight::ApplyLighting(Shader shader)
     glUniform3fv(lightAmbientLocation, 1, glm::value_ptr(ambientComponent));
     glUniform3fv(lightDiffuseLocation, 1, glm::value_ptr(diffuseComponent));
     glUniform3fv(lightSpecularLocation, 1, glm::value_ptr(specularComponent));
+}
+
+glm::mat4 DirectionalLight::CalculateShadows(Shader shader, std::vector<CWObject*> &objects, glm::mat4& view, glm::mat4& projection, const std::vector<LightSource*> &lights)
+{
+    GLfloat nearPlane = 1.0f;
+    GLfloat farPlane = 17.5f;
+
+    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlane, farPlane);
+    glm::mat4 lightView = glm::lookAt(glm::vec3(0.0f) - lightDirection, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+    shader.Use();
+
+    glViewport(0, 0, shadowWidth, shadowHeight);
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    //RENDER SCENE
+    for(int i = 0; i < objects.size(); i++)
+    {
+        objects[i]->Draw(shader, view, projection, lights, lightSpaceMatrix);
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    return lightSpaceMatrix;
 }
 
 PointLight::PointLight(glm::vec3 position, float constant, float linear, float quadratic, int id, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular)

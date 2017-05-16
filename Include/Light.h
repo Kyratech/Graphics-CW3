@@ -2,7 +2,9 @@
 #define LIGHT_SOURCE_H
 
 #include "Introduction.h"
-#include <string>
+#include "CWObject.h"
+#include <vector>
+
 
 class LightSource
 {
@@ -20,11 +22,14 @@ class DirectionalLight :public LightSource
 {
 private:
     glm::vec3 lightDirection;
-
+    GLuint depthMapFBO;
 public:
+    GLuint depthMap;
+
     DirectionalLight(glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
 
     void ApplyLighting(Shader shader);
+    glm::mat4 CalculateShadows(Shader shader, std::vector<CWObject*> &objects, glm::mat4& view, glm::mat4& projection, const std::vector<LightSource*> &lights);
 };
 
 class PointLight :public LightSource
