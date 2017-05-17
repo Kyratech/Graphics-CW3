@@ -143,7 +143,7 @@ float calculateShadows(vec3 lightDir, vec3 normals, vec4 lightSpaceFrag)
 	
 	float bias = max(0.05 * (1.0 - dot(normals, lightDir)), 0.005); 
 	//float bias = 0.005;
-	if(currentDepth - bias > closestDepth)
+	if(currentDepth > 1.0 || currentDepth - bias > closestDepth)
 	{
 		return 0.0;
 	}

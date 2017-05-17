@@ -86,6 +86,7 @@ int main(void)
 
 	/* Turn on depth testing to make stuff in front actually look like it's in front. */
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 
     /* Load the shader programs */
 	Shader celShader("Shaders/CelShader.vert", "Shaders/CelShader.frag");
