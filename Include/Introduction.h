@@ -9,7 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "ShaderLoader.h"
-#include "BLCamera.h"
+#include "fps_camera.h"
 #include "Light.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -34,6 +34,6 @@ struct Material
 };
 
 /* Set up the camera */
-extern ThreeD_Camera camera;
+extern FPS_Camera camera;
 
 #endif // INTRO_H

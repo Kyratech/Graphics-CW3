@@ -14,17 +14,18 @@
 #include "../Include/Skybox.h"
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 10.0f, 0.0f);
-ThreeD_Camera camera(cameraPos);
+FPS_Camera camera(cameraPos);
 
 /* Screen parameters */
-const int width = 800;
-const int height = 450;
+const int width = 1600;
+const int height = 900;
 
 /* Functions to handle input */
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mode);
 void mouse_movement(GLFWwindow *window, double xPos, double yPos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
-void scroll_callback(GLFWwindow* window, double xpos, double ypos);
+
+void HandleInput();
 
 void RenderQuad();
 
@@ -35,7 +36,7 @@ GLfloat lastY = height / 2.0;
 bool firstMouseInput = true;
 
 //Mouse button flags
-bool middleMouse = false;
+bool leftMouse = false;
 
 //Key pressed flags
 bool keys[1024];
@@ -58,7 +59,7 @@ int main(void)
 	}
 
 	/* Set up the main window */
-	GLFWwindow* window = glfwCreateWindow(width, height, "Coursework 1", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(width, height, "Battle Zone: Skylands", NULL, NULL);
 	if(!window)
 	{
 		std::cout << "Failed to create GLFW window." << std::endl;
@@ -70,7 +71,6 @@ int main(void)
 	/* Set the required callback functions */
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, mouse_movement);
-	glfwSetScrollCallback(window, scroll_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 	/* Set up GLEW before using any OpenGL functions */
@@ -91,6 +91,7 @@ int main(void)
     /* Load the shader programs */
 	Shader celShader("Shaders/CelShader.vert", "Shaders/CelShader.frag");
 	Shader skyboxShader("Shaders/SkyboxShader.vert", "Shaders/SkyboxShader.frag");
+	Shader waterfallShader("Shaders/WaterfallShader.vert", "Shaders/WaterfallShader.frag");
 	//For shadows
 	Shader depthShader("Shaders/DepthShader.vert", "Shaders/DepthShader.frag");
 	Shader debugDepthShader("Shaders/DebugDepth.vert", "Shaders/DebugDepth.frag");
@@ -100,23 +101,33 @@ int main(void)
 	std::vector<CWObject*> gObjects;
 
     /* Create the first tank */
-    TankObject duskTank("Images/DuelTankBody", "Images/DuelTankTurret", "Images/DuelTankGun", glm::vec3(0.0f), glm::quat());
+    TankObject duskTank("Images/DuelTankBody", "Images/DuelTankTurret", "Images/DuelTankGun", glm::vec3(0.0f, 5.0f, -30.0f), glm::quat());
     gObjects.push_back(&duskTank);
 
     /* Environment objects */
     const struct Material rock1Mat = {"Images/Rock/Rock1_DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png", 8.0f};
     OBJMesh rock1Mesh("Models/Rock1.obj", rock1Mat);
-    GraphicsObject rockObject(&rock1Mesh, glm::vec3(5.0f, 0.0f, 5.0f), glm::quat());
-    //gObjects.push_back(&rockObject);
+    GraphicsObject rockObject(&rock1Mesh, glm::vec3(5.0f, 0.0f, -35.0f), glm::quat());
+    gObjects.push_back(&rockObject);
 
     const struct Material floatingIsland1Mat = {"Images/Rock/FloatingIsland1DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png", 8.0f};
     OBJMesh floatingIsland1Mesh("Models/FloatingIsland1.obj", floatingIsland1Mat);
-    GraphicsObject floatingIslandObject(&floatingIsland1Mesh, glm::vec3(0.0f, -5.0f, 0.0f), glm::quat(), 2.0f);
+    GraphicsObject floatingIslandObject(&floatingIsland1Mesh, glm::vec3(-10.0f, 10.0f, -35.0f), glm::quat());
     gObjects.push_back(&floatingIslandObject);
+
+    const struct Material mainIslandMat = {"Images/Rock/MainIsland_DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png", 8.0f};
+    OBJMesh mainIslandMesh("Models/MainIsland.obj", mainIslandMat);
+    GraphicsObject mainIslandObject(&mainIslandMesh, glm::vec3(0.0f), glm::quat());
+    gObjects.push_back(&mainIslandObject);
+
+    const struct Material mainIslandWaterfallMat = {"Images/Rock/River_DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png"};
+    OBJMesh mainIslandWaterfallMesh("Models/MainIslandWaterfall.obj", mainIslandWaterfallMat);
+    GraphicsObject mainIslandWaterfallObject(&mainIslandWaterfallMesh, glm::vec3(0.0f), glm::quat());
+    gObjects.push_back(&mainIslandWaterfallObject);
 
     /* Create some lights */
     std::vector<LightSource*> lights;
-    DirectionalLight sun(glm::vec3(-2.0f, -5.0f, -1.0f), glm::vec3(0.2f), glm::vec3(0.5f), glm::vec3(1.0f));
+    DirectionalLight sun(glm::vec3(5.0f, -5.0f, 2.0f), glm::vec3(0.2f), glm::vec3(0.5f), glm::vec3(1.0f));
     PointLight defaultPoint(LIGHT_POS, 1.0, 0.09, 0.032, 0, glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
     SpotLight spotLight(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
     lights.push_back(&sun);
@@ -132,13 +143,14 @@ int main(void)
 		lastFrame = currentFrame;
 
 		glfwPollEvents();
+		HandleInput();
 
 		/* Generate the view matrix */
 		glm::mat4 view;
 		view = camera.GetViewMatrix();
 		/* Generate the projection matrix */
 		glm::mat4 projection;
-		projection = glm::perspective(glm::radians(camera.Fov), (GLfloat)width / (GLfloat)height, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(camera.Fov), (GLfloat)width / (GLfloat)height, 0.1f, 200.0f);
 
 		duskTank.RotateTurret(deltaTime);
 
@@ -155,10 +167,19 @@ int main(void)
         glBindTexture(GL_TEXTURE_2D, sun.depthMap);
 		glUniform1i(glGetUniformLocation(celShader.getShaderProgram(), "shadowMap"), 2);
 
-		for(int i = 0; i < gObjects.size(); i++)
+		for(int i = 0; i < gObjects.size() - 1; i++)
         {
             gObjects[i]->Draw(celShader, view, projection, lights, lightSpaceMatrix);
         }
+
+
+        waterfallShader.Use();
+        mainIslandWaterfallObject.Draw(waterfallShader, view, projection, lights, lightSpaceMatrix);
+        GLint waterfallTimerLocation = glGetUniformLocation(waterfallShader.getShaderProgram(), "timeOffset");
+        glUniform1f(waterfallTimerLocation, currentFrame * -0.1);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, sun.depthMap);
+		glUniform1i(glGetUniformLocation(waterfallShader.getShaderProgram(), "shadowMap"), 2);
 
 		//Draw the skybox last
 		skyboxShader.Use();
@@ -213,6 +234,29 @@ void RenderQuad()
     glBindVertexArray(0);
 }
 
+void HandleInput()
+{
+    if(keys[GLFW_KEY_LEFT])
+        camera.mouse_input(-200.0f * deltaTime, 0.0f);
+    else if(keys[GLFW_KEY_RIGHT])
+        camera.mouse_input(200.0f * deltaTime, 0.0f);
+
+    if(keys[GLFW_KEY_PAGE_UP])
+        camera.mouse_input(0.0f, 200.0f * deltaTime);
+    else if(keys[GLFW_KEY_PAGE_DOWN])
+        camera.mouse_input(0.0f, -200.0f * deltaTime);
+
+    if(keys[GLFW_KEY_UP])
+        camera.accelerate(2.0f);
+    else if(keys[GLFW_KEY_DOWN])
+        camera.accelerate(-2.0f);
+
+    if(keys[GLFW_KEY_SPACE])
+        camera.brake();
+
+    camera.cameraMove(deltaTime);
+}
+
 /*
 * Record the states of keys when one changes
 */
@@ -249,11 +293,6 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 
 }
 
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-	camera.scroll_input(yoffset);
-}
-
 /*
 * Record the changes in position of the mouse, use it to update the camera
 */
@@ -275,12 +314,9 @@ void mouse_movement(GLFWwindow *window, double xPos, double yPos)
 	lastY = yPos;
 
 
-	if (middleMouse)
+	if (leftMouse)
 	{
-		if (keys[GLFW_KEY_LEFT_SHIFT])
-			camera.pan_camera(deltaX, deltaY);
-		else
-			camera.move_camera(deltaX, deltaY);
+        camera.mouse_input(deltaX, deltaY);
 	}
 }
 
@@ -289,8 +325,8 @@ void mouse_movement(GLFWwindow *window, double xPos, double yPos)
 */
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-	if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS)
-		middleMouse = true;
-	else if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_RELEASE)
-		middleMouse = false;
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+		leftMouse = true;
+	else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+		leftMouse = false;
 }
