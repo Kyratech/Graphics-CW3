@@ -96,7 +96,7 @@ int main(void)
 	Shader depthShader("Shaders/DepthShader.vert", "Shaders/DepthShader.frag");
 	Shader debugDepthShader("Shaders/DebugDepth.vert", "Shaders/DebugDepth.frag");
 
-	Skybox sky("Images/mp_tf/mp_tf/thefog");
+	Skybox sky("Images/Skybox/Skybox");
 
 	std::vector<CWObject*> gObjects;
 

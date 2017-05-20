@@ -33,12 +33,12 @@ public:
         glActiveTexture(GL_TEXTURE0);
 
         std::vector<std::string> suffixes;
-        suffixes.push_back("_RIGHT.tga");
-        suffixes.push_back("_LEFT.tga");
-        suffixes.push_back("_TOP.tga");
-        suffixes.push_back("_BOTTOM.tga");
-        suffixes.push_back("_BACK.tga");
-        suffixes.push_back("_FRONT.tga");
+        suffixes.push_back("_RIGHT.png");
+        suffixes.push_back("_LEFT.png");
+        suffixes.push_back("_TOP.png");
+        suffixes.push_back("_BOTTOM.png");
+        suffixes.push_back("_BACK.png");
+        suffixes.push_back("_FRONT.png");
 
         int width, height, n;
         //Load in the 6 face images
