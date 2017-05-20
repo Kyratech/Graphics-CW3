@@ -104,6 +104,19 @@ int main(void)
     TankObject duskTank("Images/DuelTankBody", "Images/DuelTankTurret", "Images/DuelTankGun", glm::vec3(0.0f, 5.0f, -30.0f), glm::quat());
     gObjects.push_back(&duskTank);
 
+    /* Create a tank transport */
+    const struct Material duskTransportMat = {"Images/Transport_DIFFUSE.png", "Images/Transport_SPECULAR.png", 16.0f};
+    OBJMesh duskTransportMesh("Models/TransportOffset.obj", duskTransportMat);
+    GraphicsObject duskTransportObject(&duskTransportMesh, glm::vec3(0.0f, 10.0f, -30.0f), glm::quat());
+    gObjects.push_back(&duskTransportObject);
+
+    const struct Material duskTransportArmMat = {"Images/TransportArm_DIFFUSE.png", "Images/TransportArm_SPECULAR.png", 16.0f};
+    OBJMesh duskTransportArmMesh("Models/TransportArmOffset.obj", duskTransportArmMat);
+    GraphicsObject duskTransportArm1Object(&duskTransportArmMesh, glm::vec3(1.0f, 10.0f, -30.0f), glm::quat());
+    gObjects.push_back(&duskTransportArm1Object);
+    GraphicsObject duskTransportArm2Object(&duskTransportArmMesh, glm::vec3(-1.0f, 10.0f, -30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+    gObjects.push_back(&duskTransportArm2Object);
+
     /* Environment objects */
     const struct Material rock1Mat = {"Images/Rock/Rock1_DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png", 8.0f};
     OBJMesh rock1Mesh("Models/Rock1.obj", rock1Mat);
