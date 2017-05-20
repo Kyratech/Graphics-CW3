@@ -120,7 +120,7 @@ int main(void)
     GraphicsObject mainIslandObject(&mainIslandMesh, glm::vec3(0.0f), glm::quat());
     gObjects.push_back(&mainIslandObject);
 
-    const struct Material mainIslandWaterfallMat = {"Images/Rock/River_DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png"};
+    const struct Material mainIslandWaterfallMat = {"Images/Rock/River_DIFFUSE.png", "Images/Rock/River_SPECULAR.png", 16.0f};
     OBJMesh mainIslandWaterfallMesh("Models/MainIslandWaterfall.obj", mainIslandWaterfallMat);
     GraphicsObject mainIslandWaterfallObject(&mainIslandWaterfallMesh, glm::vec3(0.0f), glm::quat());
     gObjects.push_back(&mainIslandWaterfallObject);
