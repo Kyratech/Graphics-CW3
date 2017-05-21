@@ -51,11 +51,11 @@ void DirectionalLight::ApplyLighting(Shader shader)
 
 glm::mat4 DirectionalLight::CalculateShadows(Shader shader, std::vector<CWObject*> &objects, glm::mat4& view, glm::mat4& projection, const std::vector<LightSource*> &lights)
 {
-    GLfloat nearPlane = 10.0f;
-    GLfloat farPlane = 75.0f;
+    GLfloat nearPlane = 0.0f;
+    GLfloat farPlane = 120.0f;
 
     glm::mat4 lightProjection = glm::ortho(-80.0f, 80.0f, -80.0f, 80.0f, nearPlane, farPlane);
-    glm::mat4 lightView = glm::lookAt(glm::vec3(0.0f) - (lightDirection * 5.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 lightView = glm::lookAt(glm::vec3(0.0f) - (lightDirection * 6.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
     shader.Use();

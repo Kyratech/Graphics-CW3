@@ -97,6 +97,7 @@ class FPS_Camera
             }
 		    else
             {
+                collider->getRigidBody()->activate();
                 collider->applyForce(this->Front * deltaSpeed * 3.0f);
             }
 		}

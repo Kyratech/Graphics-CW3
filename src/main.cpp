@@ -111,11 +111,15 @@ int main(void)
 	std::vector<CWObject*> gObjects;
 
     /* Create the first tank */
-    TankObject duskTank("Images/DuelTankBody", "Images/DuelTankTurret", "Images/DuelTankGun", glm::vec3(0.0f, 5.0f, -30.0f), glm::quat());
+    TankObject duskTank("Images/DuskTank/DuelTankBody_Dusk", "Images/DuskTank/DuelTankTurret_Dusk", "Images/DuskTank/DuelTankGun_Dusk", glm::vec3(0.0f, 5.0f, -30.0f), glm::quat());
     gObjects.push_back(&duskTank);
 
+    /* Create the second tank */
+    TankObject dawnTank("Images/DawnTank/DuelTankBody_Dawn", "Images/DawnTank/DuelTankTurret_Dawn", "Images/DawnTank/DuelTankGun_Dawn", glm::vec3(0.0f, 5.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+    gObjects.push_back(&dawnTank);
+
     /* Create a tank transport */
-    const struct Material duskTransportMat = {"Images/Transport_DIFFUSE.png", "Images/Transport_SPECULAR.png", 16.0f};
+    const struct Material duskTransportMat = {"Images/DuskTransport/Transport_DIFFUSE.png", "Images/DuskTransport/Transport_SPECULAR.png", 16.0f};
     OBJMesh duskTransportMesh("Models/TransportOffset.obj", duskTransportMat);
     GraphicsObject duskTransportObject(&duskTransportMesh, glm::vec3(0.0f, 10.0f, -30.0f), glm::quat());
     gObjects.push_back(&duskTransportObject);
@@ -126,6 +130,16 @@ int main(void)
     gObjects.push_back(&duskTransportArm1Object);
     GraphicsObject duskTransportArm2Object(&duskTransportArmMesh, glm::vec3(-1.0f, 10.0f, -30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
     gObjects.push_back(&duskTransportArm2Object);
+
+    const struct Material dawnTransportMat = {"Images/DawnTransport/Transport_Dawn_DIFFUSE.png", "Images/DawnTransport/Transport_Dawn_SPECULAR.png", 16.0f};
+    OBJMesh dawnTransportMesh("Models/TransportOffset.obj", dawnTransportMat);
+    GraphicsObject dawnTransportObject(&dawnTransportMesh, glm::vec3(0.0f, 10.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+    gObjects.push_back(&dawnTransportObject);
+
+    GraphicsObject dawnTransportArm1Object(&duskTransportArmMesh, glm::vec3(1.0f, 10.0f, 30.0f), glm::quat());
+    gObjects.push_back(&dawnTransportArm1Object);
+    GraphicsObject dawnTransportArm2Object(&duskTransportArmMesh, glm::vec3(-1.0f, 10.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+    gObjects.push_back(&dawnTransportArm2Object);
 
     /* Environment objects */
     PhysicsConvexMesh rockCollider(true, "Models/Rock1.obj", 1.0f, glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f), &world);
