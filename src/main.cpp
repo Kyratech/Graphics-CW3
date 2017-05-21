@@ -13,6 +13,11 @@
 #include "../Include/tank/TankObject.h"
 #include "../Include/Skybox.h"
 
+//Physics
+#include "../Include/CWPhysicsObject.h"
+#include "../Include/PhysicsWrapperMini/PhysicsObjectTypes.h"
+#include "../Include/PhysicsWrapperMini/PhysicsWorld.h"
+
 glm::vec3 cameraPos = glm::vec3(0.0f, 10.0f, 0.0f);
 FPS_Camera camera(cameraPos);
 
@@ -98,6 +103,8 @@ int main(void)
 
 	Skybox sky("Images/Skybox/Skybox");
 
+	PhysicsWorld world(1.0f, false);
+
 	std::vector<CWObject*> gObjects;
 
     /* Create the first tank */
@@ -118,9 +125,10 @@ int main(void)
     gObjects.push_back(&duskTransportArm2Object);
 
     /* Environment objects */
+    PhysicsConvexMesh rockCollider(true, "Models/Rock1.obj", 1.0f, glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f), &world);
     const struct Material rock1Mat = {"Images/Rock/Rock1_DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png", 8.0f};
     OBJMesh rock1Mesh("Models/Rock1.obj", rock1Mat);
-    GraphicsObject rockObject(&rock1Mesh, glm::vec3(5.0f, 0.0f, -35.0f), glm::quat());
+    CWPhysicsObject rockObject(&rock1Mesh, &rockCollider, glm::vec3(0.0f));
     gObjects.push_back(&rockObject);
 
     const struct Material floatingIsland1Mat = {"Images/Rock/FloatingIsland1DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png", 8.0f};
@@ -128,9 +136,10 @@ int main(void)
     GraphicsObject floatingIslandObject(&floatingIsland1Mesh, glm::vec3(-10.0f, 10.0f, -35.0f), glm::quat());
     gObjects.push_back(&floatingIslandObject);
 
+    PhysicsConvexMesh mainIslandCollider(false, "Models/MainIslandCollision.obj", 1.0f, glm::vec3(0.0f), glm::vec3(0.0f), &world);
     const struct Material mainIslandMat = {"Images/Rock/MainIsland_DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png", 8.0f};
     OBJMesh mainIslandMesh("Models/MainIsland.obj", mainIslandMat);
-    GraphicsObject mainIslandObject(&mainIslandMesh, glm::vec3(0.0f), glm::quat());
+    CWPhysicsObject mainIslandObject(&mainIslandMesh, &mainIslandCollider, glm::vec3(0.0f));
     gObjects.push_back(&mainIslandObject);
 
     const struct Material mainIslandWaterfallMat = {"Images/Rock/River_DIFFUSE.png", "Images/Rock/River_SPECULAR.png", 16.0f};
@@ -157,6 +166,8 @@ int main(void)
 
 		glfwPollEvents();
 		HandleInput();
+
+		world.stepWorld(deltaTime);
 
 		/* Generate the view matrix */
 		glm::mat4 view;
