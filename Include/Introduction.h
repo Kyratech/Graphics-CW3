@@ -33,6 +33,13 @@ struct Material
     float shininess;
 };
 
+struct CWKeyframe
+{
+    glm::vec3 position;
+    glm::quat orientation;
+    GLfloat time;
+};
+
 /* Set up the camera */
 extern FPS_Camera camera;
 

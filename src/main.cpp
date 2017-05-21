@@ -50,6 +50,8 @@ bool keys[1024];
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
+GLfloat simulationTime = 0.0f;
+
 //For scene selection
 static int e = 0;
 bool stillRunning = true;
@@ -135,6 +137,12 @@ int main(void)
     OBJMesh dawnTransportMesh("Models/TransportOffset.obj", dawnTransportMat);
     GraphicsObject dawnTransportObject(&dawnTransportMesh, glm::vec3(0.0f, 10.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
     gObjects.push_back(&dawnTransportObject);
+    struct CWKeyframe key1 = {glm::vec3(0.0f, 10.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 0.0f};
+    struct CWKeyframe key2 = {glm::vec3(20.0f, 10.0f, 20.0f), glm::angleAxis(glm::radians(60.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 10.0f};
+    struct CWKeyframe key3 = {glm::vec3(40.0f, 10.0f, 10.0f), glm::angleAxis(glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 20.0f};
+    dawnTransportObject.addKeyframe(key1);
+    dawnTransportObject.addKeyframe(key2);
+    dawnTransportObject.addKeyframe(key3);
 
     GraphicsObject dawnTransportArm1Object(&duskTransportArmMesh, glm::vec3(1.0f, 10.0f, 30.0f), glm::quat());
     gObjects.push_back(&dawnTransportArm1Object);
@@ -180,6 +188,7 @@ int main(void)
 		GLfloat currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+		simulationTime += deltaTime;
 
 		glfwPollEvents();
 		HandleInput();
@@ -212,9 +221,9 @@ int main(void)
 
 		for(int i = 0; i < gObjects.size() - 1; i++)
         {
+            gObjects[i]->MotionTween(simulationTime);
             gObjects[i]->Draw(celShader, view, projection, lights, lightSpaceMatrix);
         }
-
 
         waterfallShader.Use();
         mainIslandWaterfallObject.Draw(waterfallShader, view, projection, lights, lightSpaceMatrix);

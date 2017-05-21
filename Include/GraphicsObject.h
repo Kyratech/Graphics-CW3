@@ -9,6 +9,9 @@ private:
     Mesh* mesh;
     glm::vec3 worldPosition;
     float scale;
+
+    std::vector<struct CWKeyframe> keyframes;
+    int keyframeIndex;
 public:
     glm::quat rotation;
     GraphicsObject(Mesh* myMesh, glm::vec3 initialPosition, glm::quat initialRotation)
@@ -17,6 +20,8 @@ public:
         worldPosition = initialPosition;
         rotation = initialRotation;
         scale = 1.0f;
+
+        keyframeIndex = 0;
     }
 
     GraphicsObject(Mesh* myMesh, glm::vec3 initialPosition, glm::quat initialRotation, float meshScale)
@@ -25,6 +30,29 @@ public:
         worldPosition = initialPosition;
         rotation = initialRotation;
         scale = meshScale;
+
+        keyframeIndex = 0;
+    }
+
+    virtual void MotionTween(float time)
+    {
+        if(keyframeIndex < (int) keyframes.size() - 1)
+        {
+            if(time > keyframes[keyframeIndex + 1].time)
+            {
+                keyframeIndex++;
+            }
+
+            float timeDiff = keyframes[keyframeIndex + 1].time - keyframes[keyframeIndex].time;
+            float timeNow = time - keyframes[keyframeIndex].time;
+            float tweenFactor = timeNow / timeDiff;
+
+            glm::vec3 translationDiff = keyframes[keyframeIndex + 1].position - keyframes[keyframeIndex].position;
+            worldPosition = keyframes[keyframeIndex].position + translationDiff * tweenFactor;
+
+            rotation = glm::slerp(keyframes[keyframeIndex].orientation, keyframes[keyframeIndex + 1].orientation, tweenFactor);
+
+        }
     }
 
     virtual void Draw(Shader shader, glm::mat4& view, glm::mat4& projection, const std::vector<LightSource*> &lights, glm::mat4& lightSpace)
@@ -67,6 +95,11 @@ public:
 
 
         mesh->Draw(shader, lights);
+    }
+
+    void addKeyframe(struct CWKeyframe newKey)
+    {
+        keyframes.push_back(newKey);
     }
 
     void setPostion(glm::vec3 newPos)

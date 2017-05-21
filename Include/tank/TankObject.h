@@ -15,6 +15,9 @@ private:
 
     glm::vec3 worldPosition;
     glm::quat rotation;
+
+    std::vector<struct CWKeyframe> keyframes;
+    int keyframeIndex;
 public:
     TankObject(std::string bodyTex, std::string turretTex, std::string cannonTex, glm::vec3 initialPos, glm::quat initialRotation)
     {
@@ -38,6 +41,27 @@ public:
         delete tankBodyMesh;
         delete tankTurretMesh;
         delete tankCannonMesh;
+    }
+
+    virtual void MotionTween(float time)
+    {
+        if(keyframeIndex < (int) keyframes.size() - 1)
+        {
+            if(time > keyframes[keyframeIndex + 1].time)
+            {
+                keyframeIndex++;
+            }
+
+            float timeDiff = keyframes[keyframeIndex + 1].time - keyframes[keyframeIndex].time;
+            float timeNow = time - keyframes[keyframeIndex].time;
+            float tweenFactor = timeNow / timeDiff;
+
+            glm::vec3 translationDiff = keyframes[keyframeIndex + 1].position - keyframes[keyframeIndex].position;
+            worldPosition = keyframes[keyframeIndex].position + translationDiff * tweenFactor;
+
+            rotation = glm::slerp(keyframes[keyframeIndex].orientation, keyframes[keyframeIndex + 1].orientation, tweenFactor);
+
+        }
     }
 
     void Draw(Shader shader, glm::mat4& view, glm::mat4& projection, const std::vector<LightSource*> &lights, glm::mat4& lightSpace)
@@ -64,6 +88,11 @@ public:
 
         tankBodyMesh->Draw(shader, lights);
         turret->Draw(shader, view, projection, model, lights);
+    }
+
+    void addKeyframe(struct CWKeyframe newKey)
+    {
+        keyframes.push_back(newKey);
     }
 
     void Translate(glm::vec3 translation)
