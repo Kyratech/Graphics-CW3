@@ -51,12 +51,22 @@ public:
 
     void RotateTurret(float angle)
     {
-        turretRotation = glm::angleAxis(angle, glm::vec3(0.0f, 1.0f, 0.0f)) * turretRotation;
+        turretRotation = glm::angleAxis(glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f)) * turretRotation;
+    }
+
+    void SetTurretRotation(float angle)
+    {
+        turretRotation = glm::angleAxis(glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
     }
 
     void RotateCannon(float angle)
     {
         cannon->RotateCannon(angle);
+    }
+
+    void SetCannonRotation(float angle)
+    {
+        cannon->SetCannonRotation(angle);
     }
 };
 

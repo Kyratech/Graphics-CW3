@@ -62,7 +62,7 @@ public:
             mesh->Draw(shader, lights);
         }
 
-		void ResetObject()
+		virtual void ResetObject()
 		{
 			physicsObject->resetTransform();
 		}

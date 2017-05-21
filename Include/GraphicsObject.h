@@ -12,23 +12,34 @@ private:
 
     std::vector<struct CWKeyframe> keyframes;
     int keyframeIndex;
+
+    glm::vec3 initialPosition;
+    glm::quat initialOrientation;
 public:
     glm::quat rotation;
-    GraphicsObject(Mesh* myMesh, glm::vec3 initialPosition, glm::quat initialRotation)
+    GraphicsObject(Mesh* myMesh, glm::vec3 initialPos, glm::quat initialRot)
     {
         mesh = myMesh;
-        worldPosition = initialPosition;
-        rotation = initialRotation;
+
+        worldPosition = initialPos;
+        initialPosition = initialPos;
+        rotation = initialRot;
+        initialOrientation = initialRot;
+
         scale = 1.0f;
 
         keyframeIndex = 0;
     }
 
-    GraphicsObject(Mesh* myMesh, glm::vec3 initialPosition, glm::quat initialRotation, float meshScale)
+    GraphicsObject(Mesh* myMesh, glm::vec3 initialPos, glm::quat initialRot, float meshScale)
     {
         mesh = myMesh;
-        worldPosition = initialPosition;
-        rotation = initialRotation;
+
+        worldPosition = initialPos;
+        initialPosition = initialPos;
+        rotation = initialRot;
+        initialOrientation = initialRot;
+
         scale = meshScale;
 
         keyframeIndex = 0;
@@ -38,11 +49,6 @@ public:
     {
         if(keyframeIndex < (int) keyframes.size() - 1)
         {
-            if(time > keyframes[keyframeIndex + 1].time)
-            {
-                keyframeIndex++;
-            }
-
             float timeDiff = keyframes[keyframeIndex + 1].time - keyframes[keyframeIndex].time;
             float timeNow = time - keyframes[keyframeIndex].time;
             float tweenFactor = timeNow / timeDiff;
@@ -52,6 +58,10 @@ public:
 
             rotation = glm::slerp(keyframes[keyframeIndex].orientation, keyframes[keyframeIndex + 1].orientation, tweenFactor);
 
+            if(time > keyframes[keyframeIndex + 1].time)
+            {
+                keyframeIndex++;
+            }
         }
     }
 
@@ -110,6 +120,12 @@ public:
     void setRotation(glm::quat newRot)
     {
         rotation = newRot;
+    }
+
+    virtual void ResetObject()
+    {
+        worldPosition = initialPosition;
+        rotation = initialOrientation;
     }
 };
 

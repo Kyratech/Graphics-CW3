@@ -45,7 +45,12 @@ public:
 
     void RotateCannon(float angle)
     {
-        cannonRotation = glm::angleAxis(angle, glm::vec3(1.0f, 0.0f, 0.0f)) * cannonRotation;
+        cannonRotation = glm::angleAxis(glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f)) * cannonRotation;
+    }
+
+    void SetCannonRotation(float angle)
+    {
+        cannonRotation = glm::angleAxis(glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
     }
 };
 

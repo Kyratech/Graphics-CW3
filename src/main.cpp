@@ -115,6 +115,12 @@ int main(void)
     /* Create the first tank */
     TankObject duskTank("Images/DuskTank/DuelTankBody_Dusk", "Images/DuskTank/DuelTankTurret_Dusk", "Images/DuskTank/DuelTankGun_Dusk", glm::vec3(0.0f, 5.0f, -30.0f), glm::quat());
     gObjects.push_back(&duskTank);
+    duskTank.addTurretKeyframe({0.0f, 0.0f});
+    duskTank.addTurretKeyframe({45.0f, 10.0f});
+    duskTank.addTurretKeyframe({90.0f, 15.0f});
+    duskTank.addCannonKeyframe({0.0f, 0.0f});
+    duskTank.addCannonKeyframe({0.0f, 7.5f});
+    duskTank.addCannonKeyframe({-60.0f, 17.5f});
 
     /* Create the second tank */
     TankObject dawnTank("Images/DawnTank/DuelTankBody_Dawn", "Images/DawnTank/DuelTankTurret_Dawn", "Images/DawnTank/DuelTankGun_Dawn", glm::vec3(0.0f, 5.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
@@ -203,8 +209,6 @@ int main(void)
 		/* Generate the projection matrix */
 		glm::mat4 projection;
 		projection = glm::perspective(glm::radians(camera.Fov), (GLfloat)width / (GLfloat)height, 0.1f, 200.0f);
-
-		duskTank.RotateTurret(deltaTime);
 
 		glm::mat4 lightSpaceMatrix = sun.CalculateShadows(depthShader, gObjects, view, projection, lights);
 

@@ -40,6 +40,13 @@ struct CWKeyframe
     GLfloat time;
 };
 
+//Used by the tank to angle the turret and gun
+struct TankKeyframe
+{
+    GLfloat angle;
+    GLfloat time;
+};
+
 /* Set up the camera */
 extern FPS_Camera camera;
 
