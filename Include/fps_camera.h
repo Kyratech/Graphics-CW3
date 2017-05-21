@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "PhysicsWrapperMini/PhysicsObjectTypes.h"
 
 enum Camera_Directions
 {
@@ -45,6 +46,12 @@ class FPS_Camera
 			this->updateCameraVectors();
 		}
 
+		void addCollider(PhysicsObject* po)
+		{
+            collider = po;
+            collider->getRigidBody()->setGravity(btVector3(0,0,0));
+		}
+
 		glm::mat4 GetViewMatrix()
 		{
 			return glm::lookAt(this->Position, this->Position + this->Front, this->Up);
@@ -75,21 +82,41 @@ class FPS_Camera
 
 		void accelerate(float deltaSpeed)
 		{
-		    MovementSpeed += deltaSpeed;
+		    if(collider == NULL)
+            {
+                MovementSpeed += deltaSpeed;
 
-		    if(MovementSpeed >= 100.0f)
-            {
-                MovementSpeed = 100.0f;
+                if(MovementSpeed >= 100.0f)
+                {
+                    MovementSpeed = 100.0f;
+                }
+                else if(MovementSpeed <= 0)
+                {
+                    MovementSpeed = 0;
+                }
             }
-		    else if(MovementSpeed <= 0)
+		    else
             {
-                MovementSpeed = 0;
+                collider->applyForce(this->Front * deltaSpeed * 3.0f);
             }
 		}
 
 		void brake()
 		{
-		    MovementSpeed = 0;
+		    if(collider == NULL)
+            {
+                MovementSpeed = 0;
+            }
+		    else
+            {
+                btRigidBody* body = collider->getRigidBody();
+                body->clearForces();
+
+                //Stop the object moving
+                btVector3 zeroVector(0, 0, 0);
+                body->setLinearVelocity(zeroVector);
+                body->setAngularVelocity(zeroVector);
+            }
 		}
 
 		void keyboard_input(Camera_Directions direction, GLfloat deltaTime)
@@ -110,11 +137,20 @@ class FPS_Camera
 
 		void cameraMove(GLfloat deltaTime)
 		{
-		    GLfloat cameraSpeed = this->MovementSpeed * deltaTime;
-		    this->Position += this->Front * cameraSpeed;
+		    if(collider == NULL)
+            {
+                GLfloat cameraSpeed = this->MovementSpeed * deltaTime;
+                this->Position += this->Front * cameraSpeed;
+            }
+            else
+            {
+                this->Position = collider->getPosition();
+            }
 		}
 
 	private:
+	    PhysicsObject* collider;
+
 		void updateCameraVectors()
 		{
 			glm::vec3 cameraFront;

@@ -105,6 +105,9 @@ int main(void)
 
 	PhysicsWorld world(1.0f, false);
 
+	PhysicsBall cameraCollider(camera.GetCameraPosition(), &world);
+	camera.addCollider(&cameraCollider);
+
 	std::vector<CWObject*> gObjects;
 
     /* Create the first tank */
@@ -168,6 +171,8 @@ int main(void)
 		HandleInput();
 
 		world.stepWorld(deltaTime);
+
+		camera.cameraMove(deltaTime);
 
 		/* Generate the view matrix */
 		glm::mat4 view;
@@ -277,8 +282,6 @@ void HandleInput()
 
     if(keys[GLFW_KEY_SPACE])
         camera.brake();
-
-    camera.cameraMove(deltaTime);
 }
 
 /*
