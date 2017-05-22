@@ -107,7 +107,7 @@ public:
         }
     }
 
-    void Draw(Shader shader, glm::mat4& view, glm::mat4& projection, const std::vector<LightSource*> &lights, glm::mat4& lightSpace)
+    void Draw(Shader shader, glm::mat4& view, glm::mat4& projection, glm::mat4& lightSpace)
     {
         glm::mat4 model;
         model = glm::translate(model, this->worldPosition);
@@ -129,7 +129,7 @@ public:
         GLint lightSpaceLocation = glGetUniformLocation(shader.getShaderProgram(), "lightSpace");
         glUniformMatrix4fv(lightSpaceLocation, 1, GL_FALSE, glm::value_ptr(lightSpace));
 
-        transportBodyMesh->Draw(shader, lights);
+        transportBodyMesh->Draw(shader);
 
         glm::vec3 arm1Offset(0.5f, 0.0f, 0.0f);
         glm::vec3 arm2Offset(-0.5f, 0.0f, 0.0f);
@@ -145,7 +145,7 @@ public:
         glm::mat3 arm1NormalMatrix = glm::mat3(glm::transpose(glm::inverse(arm1Model)));
         glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(arm1NormalMatrix));
 
-        armMesh->Draw(shader, lights);
+        armMesh->Draw(shader);
 
         /* ARM 2 */
         glm::mat4 arm2Model = glm::translate(model, arm2Offset);
@@ -158,7 +158,7 @@ public:
         glm::mat3 arm2NormalMatrix = glm::mat3(glm::transpose(glm::inverse(arm2Model)));
         glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(arm2NormalMatrix));
 
-        armMesh->Draw(shader, lights);
+        armMesh->Draw(shader);
     }
 
     void addKeyframe(struct CWKeyframe newKey)

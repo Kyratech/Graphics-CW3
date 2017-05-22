@@ -69,7 +69,7 @@ glm::mat4 DirectionalLight::CalculateShadows(Shader shader, std::vector<CWObject
     //RENDER SCENE
     for(int i = 0; i < objects.size(); i++)
     {
-        objects[i]->Draw(shader, view, projection, lights, lightSpaceMatrix);
+        objects[i]->Draw(shader, view, projection, lightSpaceMatrix);
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -100,6 +100,8 @@ void PointLight::ApplyLighting(Shader shader)
     GLint lightDiffuseLocation = glGetUniformLocation(shader.getShaderProgram(), ("pointLights[" + id + "].diffuse").c_str());
     GLint lightSpecularLocation = glGetUniformLocation(shader.getShaderProgram(), ("pointLights[" + id + "].specular").c_str());
 
+    //std::cout << "Sending stuff to: " << lightPositionLocation <<", for: " << id << std::endl;
+
     glUniform3fv(lightPositionLocation, 1, glm::value_ptr(lightPosition));
     glUniform1f(constantComponentLocation, constantComponent);
     glUniform1f(linearComponentLocation, linearComponent);
@@ -107,6 +109,11 @@ void PointLight::ApplyLighting(Shader shader)
     glUniform3fv(lightAmbientLocation, 1, glm::value_ptr(ambientComponent));
     glUniform3fv(lightDiffuseLocation, 1, glm::value_ptr(diffuseComponent));
     glUniform3fv(lightSpecularLocation, 1, glm::value_ptr(specularComponent));
+}
+
+void PointLight::SetPosition(glm::vec3 newPos)
+{
+    lightPosition = newPos;
 }
 
 SpotLight::SpotLight(glm::vec3 position, glm::vec3 direction, float cutoff, float outerCutoff, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular)

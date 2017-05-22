@@ -108,7 +108,7 @@ public:
         }
     }
 
-    void Draw(Shader shader, glm::mat4& view, glm::mat4& projection, const std::vector<LightSource*> &lights, glm::mat4& lightSpace)
+    void Draw(Shader shader, glm::mat4& view, glm::mat4& projection, glm::mat4& lightSpace)
     {
         glm::mat4 model;
         model = glm::translate(model, this->worldPosition);
@@ -130,8 +130,8 @@ public:
         GLint lightSpaceLocation = glGetUniformLocation(shader.getShaderProgram(), "lightSpace");
         glUniformMatrix4fv(lightSpaceLocation, 1, GL_FALSE, glm::value_ptr(lightSpace));
 
-        tankBodyMesh->Draw(shader, lights);
-        turret->Draw(shader, view, projection, model, lights);
+        tankBodyMesh->Draw(shader);
+        turret->Draw(shader, view, projection, model);
     }
 
     void addKeyframe(struct CWKeyframe newKey)

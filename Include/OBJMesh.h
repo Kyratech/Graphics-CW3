@@ -136,14 +136,9 @@ public:
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    void Draw(Shader shader, const std::vector<LightSource*> &lights)
+    void Draw(Shader shader)
     {
         shader.Use();
-
-        for(int i = 0; i < lights.size(); i++)
-        {
-            lights[i]->ApplyLighting(shader);
-        }
 
         GLint viewPosLocation = glGetUniformLocation(shader.getShaderProgram(), "viewPos");
         glUniform3f(viewPosLocation, camera.GetCameraPosition().x, camera.GetCameraPosition().y, camera.GetCameraPosition().z);

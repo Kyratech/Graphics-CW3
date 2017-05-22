@@ -68,7 +68,7 @@ public:
     }
 
     /* Draw the mesh with the supplied texture */
-    void Draw(Shader shader, const std::vector<LightSource*> &lights)
+    void Draw(Shader shader)
     {
         GLint colourLocation = glGetUniformLocation(shader.getShaderProgram(), "baseColour");
         glUniform4f(colourLocation, r, g, b, 1.0f);

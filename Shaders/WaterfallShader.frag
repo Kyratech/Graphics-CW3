@@ -52,9 +52,9 @@ uniform Material material;
 uniform float timeOffset;
 
 uniform DirLight sunLight;
-#define NR_POINT_LIGHTS 1 
+#define NR_POINT_LIGHTS 2 
 uniform PointLight pointLights[NR_POINT_LIGHTS];
-uniform SpotLight spotLight;
+//uniform SpotLight spotLight;
 uniform sampler2D shadowMap;
 
 vec3 celAmbient(vec3 ambientInput)
@@ -167,7 +167,7 @@ void main()
     for(int i = 0; i < NR_POINT_LIGHTS; i++)
         result += calculatePointLight(pointLights[i], normals, shadow);
 
-    result += calculateSpotLight(spotLight, normals, shadow);    
+    //result += calculateSpotLight(spotLight, normals, shadow);    
     
     colour = vec4(result, 1.0);
 }

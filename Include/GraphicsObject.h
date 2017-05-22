@@ -66,7 +66,7 @@ public:
         }
     }
 
-    virtual void Draw(Shader shader, glm::mat4& view, glm::mat4& projection, const std::vector<LightSource*> &lights, glm::mat4& lightSpace)
+    virtual void Draw(Shader shader, glm::mat4& view, glm::mat4& projection, glm::mat4& lightSpace)
     {
         glm::mat4 model;
         model = glm::translate(model, this->worldPosition);
@@ -89,23 +89,7 @@ public:
         GLint lightSpaceLocation = glGetUniformLocation(shader.getShaderProgram(), "lightSpace");
         glUniformMatrix4fv(lightSpaceLocation, 1, GL_FALSE, glm::value_ptr(lightSpace));
 
-        mesh->Draw(shader, lights);
-    }
-
-    /* Alternative version of Draw takes the transform of the object directly */
-    void Draw(Shader shader, glm::mat4 model, glm::mat4 view, glm::mat4 projection, const std::vector<LightSource*> &lights)
-    {
-        glm::mat4 MVP = projection * view * model;
-
-        GLint mvpLocation = glGetUniformLocation(shader.getShaderProgram(), "MVPmatrix");
-        glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, glm::value_ptr(MVP));
-
-        GLint modelLocation = glGetUniformLocation(shader.getShaderProgram(), "modelMatrix");
-        glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
-
-
-        mesh->Draw(shader, lights);
+        mesh->Draw(shader);
     }
 
     void addKeyframe(struct CWKeyframe newKey)

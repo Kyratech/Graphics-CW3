@@ -17,6 +17,7 @@
 
 //Physics
 #include "../Include/CWPhysicsObject.h"
+#include "../Include/CWPhysicsLamp.h"
 #include "../Include/PhysicsWrapperMini/PhysicsObjectTypes.h"
 #include "../Include/PhysicsWrapperMini/PhysicsWorld.h"
 
@@ -95,12 +96,13 @@ int main(void)
 
 	/* Turn on depth testing to make stuff in front actually look like it's in front. */
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 
     /* Load the shader programs */
 	Shader celShader("Shaders/CelShader.vert", "Shaders/CelShader.frag");
 	Shader skyboxShader("Shaders/SkyboxShader.vert", "Shaders/SkyboxShader.frag");
 	Shader waterfallShader("Shaders/WaterfallShader.vert", "Shaders/WaterfallShader.frag");
+	Shader unlitShader("Shaders/UnlitShader.vert", "Shaders/UnlitShader.frag");
 	//For shadows
 	Shader depthShader("Shaders/DepthShader.vert", "Shaders/DepthShader.frag");
 	Shader debugDepthShader("Shaders/DebugDepth.vert", "Shaders/DebugDepth.frag");
@@ -122,36 +124,13 @@ int main(void)
     TankObject dawnTank("Images/DawnTank/DuelTankBody_Dawn", "Images/DawnTank/DuelTankTurret_Dawn", "Images/DawnTank/DuelTankGun_Dawn", glm::vec3(0.0f, 5.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
     gObjects.push_back(&dawnTank);
 
-    /* Create a tank transport
-    const struct Material duskTransportMat = {"Images/DuskTransport/Transport_DIFFUSE.png", "Images/DuskTransport/Transport_SPECULAR.png", 16.0f};
-    OBJMesh duskTransportMesh("Models/TransportOffset.obj", duskTransportMat);
-    GraphicsObject duskTransportObject(&duskTransportMesh, glm::vec3(0.0f, 10.0f, -30.0f), glm::quat());
-    gObjects.push_back(&duskTransportObject);
-
-    const struct Material duskTransportArmMat = {"Images/TransportArm_DIFFUSE.png", "Images/TransportArm_SPECULAR.png", 16.0f};
-    OBJMesh duskTransportArmMesh("Models/TransportArmOffset.obj", duskTransportArmMat);
-    GraphicsObject duskTransportArm1Object(&duskTransportArmMesh, glm::vec3(1.0f, 10.0f, -30.0f), glm::quat());
-    gObjects.push_back(&duskTransportArm1Object);
-    GraphicsObject duskTransportArm2Object(&duskTransportArmMesh, glm::vec3(-1.0f, 10.0f, -30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
-    gObjects.push_back(&duskTransportArm2Object);
-    */
-
+    /* Create the first transport */
     TransportObject duskTransport("Images/DuskTransport/Transport", glm::vec3(0.0f, 10.0f, -30.0f), glm::quat());
     gObjects.push_back(&duskTransport);
 
+    /* Create the second transport */
     TransportObject dawnTransport("Images/DawnTransport/Transport_Dawn", glm::vec3(0.0f, 5.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
     gObjects.push_back(&dawnTransport);
-
-    /* Second tank transport
-    const struct Material dawnTransportMat = {"Images/DawnTransport/Transport_Dawn_DIFFUSE.png", "Images/DawnTransport/Transport_Dawn_SPECULAR.png", 16.0f};
-    OBJMesh dawnTransportMesh("Models/TransportOffset.obj", dawnTransportMat);
-    GraphicsObject dawnTransportObject(&dawnTransportMesh, glm::vec3(0.0f, 10.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
-    gObjects.push_back(&dawnTransportObject);
-
-    //GraphicsObject dawnTransportArm1Object(&duskTransportArmMesh, glm::vec3(1.0f, 10.0f, 30.0f), glm::quat());
-    //gObjects.push_back(&dawnTransportArm1Object);
-    //GraphicsObject dawnTransportArm2Object(&duskTransportArmMesh, glm::vec3(-1.0f, 10.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
-    //gObjects.push_back(&dawnTransportArm2Object);*/
 
     SetupAnimation(duskTank, dawnTank, duskTransport, dawnTransport);
 
@@ -180,12 +159,24 @@ int main(void)
 
     /* Create some lights */
     std::vector<LightSource*> lights;
-    DirectionalLight sun(glm::vec3(5.0f, -5.0f, 2.0f), glm::vec3(0.2f), glm::vec3(0.5f), glm::vec3(1.0f));
-    PointLight defaultPoint(LIGHT_POS, 1.0, 0.09, 0.032, 0, glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
-    SpotLight spotLight(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
+    DirectionalLight sun(glm::vec3(5.0f, -5.0f, 2.0f), glm::vec3(0.4f), glm::vec3(0.8f), glm::vec3(1.0f));
+    PointLight duskPoint(LIGHT_POS, 1.0, 0.01, 0.032, 0, glm::vec3(0.0f, 0.1f, 0.2f), glm::vec3(0.0f, 0.4f, 0.8f), glm::vec3(0.0f, 0.5f, 1.0f));
+    PointLight dawnPoint(LIGHT_POS, 1.0, 0.01, 0.032, 1, glm::vec3(0.0f, 0.2f, 0.0f), glm::vec3(0.0f, 0.8f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    //SpotLight spotLight(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
     lights.push_back(&sun);
-    lights.push_back(&defaultPoint);
-    lights.push_back(&spotLight);
+    lights.push_back(&duskPoint);
+    lights.push_back(&dawnPoint);
+    //lights.push_back(&spotLight);
+
+    GLfloat cyan[3] = {0.0f, 1.0f, 1.0f};
+    TriangleMesh duskProjectileMesh(GetParticleSphere(0.5f), "na", cyan);
+    PhysicsBall duskProjectileBody(true, 0.5f, 2.0f, glm::vec3(0.0f, 10.0f, 0.0f), &world);
+    CWPhysicsLamp duskProjectile(&duskProjectileMesh, &duskProjectileBody, glm::vec3(0.0f), duskPoint);
+
+    GLfloat green[3] = {0.0f, 1.0f, 0.0f};
+    TriangleMesh dawnProjectileMesh(GetParticleSphere(0.5f), "na", green);
+    PhysicsBall dawnProjectileBody(true, 0.5f, 2.0f, glm::vec3(5.0f, 10.0f, 5.0f), &world);
+    CWPhysicsLamp dawnProjectile(&dawnProjectileMesh, &dawnProjectileBody, glm::vec3(0.0f), dawnPoint);
 
 	/* Main loop */
 	while(!glfwWindowShouldClose(window) && stillRunning)
@@ -200,6 +191,11 @@ int main(void)
 		HandleInput();
 
 		world.stepWorld(deltaTime);
+
+		duskProjectile.UpdateLight();
+		dawnProjectile.UpdateLight();
+
+
 
 		camera.cameraMove(deltaTime);
 
@@ -219,6 +215,11 @@ int main(void)
 
 		celShader.Use();
 
+        for(int i = 0; i < lights.size(); i++)
+        {
+            lights[i]->ApplyLighting(celShader);
+        }
+
 		glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, sun.depthMap);
 		glUniform1i(glGetUniformLocation(celShader.getShaderProgram(), "shadowMap"), 2);
@@ -226,11 +227,21 @@ int main(void)
 		for(int i = 0; i < gObjects.size() - 1; i++)
         {
             gObjects[i]->MotionTween(simulationTime);
-            gObjects[i]->Draw(celShader, view, projection, lights, lightSpaceMatrix);
+            gObjects[i]->Draw(celShader, view, projection, lightSpaceMatrix);
         }
 
+        unlitShader.Use();
+        duskProjectile.Draw(unlitShader, view, projection, lightSpaceMatrix);
+        dawnProjectile.Draw(unlitShader, view, projection, lightSpaceMatrix);
+
         waterfallShader.Use();
-        mainIslandWaterfallObject.Draw(waterfallShader, view, projection, lights, lightSpaceMatrix);
+
+        for(int i = 0; i < lights.size(); i++)
+        {
+            lights[i]->ApplyLighting(waterfallShader);
+        }
+
+        mainIslandWaterfallObject.Draw(waterfallShader, view, projection, lightSpaceMatrix);
         GLint waterfallTimerLocation = glGetUniformLocation(waterfallShader.getShaderProgram(), "timeOffset");
         glUniform1f(waterfallTimerLocation, currentFrame * -0.1);
         glActiveTexture(GL_TEXTURE2);

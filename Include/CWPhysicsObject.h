@@ -7,11 +7,12 @@
 class CWPhysicsObject: public CWObject
 {
 private:
-		Mesh *mesh;
-		glm::vec3 position;
-		PhysicsObject* physicsObject;
 		glm::vec3 initialWorldPosition;
 		glm::quat initialWorldQuaternion;
+protected:
+        Mesh *mesh;
+        PhysicsObject* physicsObject;
+        glm::vec3 position;
 public:
 		CWPhysicsObject(Mesh* myMesh, PhysicsObject* myPhysicsObject, glm::vec3 offset)
 		{
@@ -29,7 +30,7 @@ public:
             //Do nothing
         }
 
-		virtual void Draw(Shader shader, glm::mat4& view, glm::mat4& projection, const std::vector<LightSource*> &lights, glm::mat4& lightSpace)
+		virtual void Draw(Shader shader, glm::mat4& view, glm::mat4& projection, glm::mat4& lightSpace)
         {
             glm::mat4 model;
 
@@ -59,7 +60,7 @@ public:
             GLint lightSpaceLocation = glGetUniformLocation(shader.getShaderProgram(), "lightSpace");
             glUniformMatrix4fv(lightSpaceLocation, 1, GL_FALSE, glm::value_ptr(lightSpace));
 
-            mesh->Draw(shader, lights);
+            mesh->Draw(shader);
         }
 
 		virtual void ResetObject()

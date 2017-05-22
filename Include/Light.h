@@ -44,6 +44,8 @@ public:
     PointLight(glm::vec3 position, float constant, float linear, float quadratic, int id, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
 
     void ApplyLighting(Shader shader);
+
+    void SetPosition(glm::vec3 newPos);
 };
 
 class SpotLight :public LightSource
