@@ -51,6 +51,8 @@ public:
         btTransform newTrans;
         newTrans.setOrigin(btVector3(newPos.x, newPos.y, newPos.z));
 
+        //If the object had come to rest, it may have deactivated. Reactivate it so that the world starts updating it again.
+        rigidBody->activate();
         //Teleport the object to its initial position
         rigidBody->setWorldTransform(newTrans);
 

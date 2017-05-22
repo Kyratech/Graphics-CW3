@@ -19,14 +19,16 @@ private:
     std::vector<struct CWKeyframe> keyframes;
     std::vector<struct TankKeyframe> turretKeyframes;
     std::vector<struct TankKeyframe> gunKeyframes;
+    std::vector<float> fireKeyframes;
     int keyframeIndex;
     int turretKeyframeIndex;
     int gunKeyframeIndex;
+    int fireKeyframeIndex;
 
     glm::vec3 initialPosition;
     glm::quat initialOrientation;
 public:
-    TankObject(std::string bodyTex, std::string turretTex, std::string cannonTex, glm::vec3 initialPos, glm::quat initialRotation)
+    TankObject(std::string bodyTex, std::string turretTex, std::string cannonTex, glm::vec3 initialPos, glm::quat initialRotation, CWPhysicsLamp &projectile)
     {
         const struct Material bodyMat = {bodyTex + "_DIFFUSE.png", bodyTex + "_SPECULAR.png", 64.0f};
         const struct Material turretMat = {turretTex + "_DIFFUSE.png", turretTex + "_SPECULAR.png", 64.0f};
@@ -35,7 +37,7 @@ public:
         tankTurretMesh = new OBJMesh("Models/DuelTank_Turret_smooth_moved.obj", turretMat);
         tankCannonMesh = new OBJMesh("Models/DuelTank_Cannon_smooth_moved.obj", cannonMat);
 
-        CannonObject* cannon = new CannonObject(tankCannonMesh);
+        CannonObject* cannon = new CannonObject(tankCannonMesh, projectile);
         turret = new TurretObject(tankTurretMesh, cannon);
 
         worldPosition = initialPos;
@@ -46,6 +48,7 @@ public:
         keyframeIndex = 0;
         turretKeyframeIndex = 0;
         gunKeyframeIndex = 0;
+        fireKeyframeIndex = 0;
     }
 
     ~TankObject()
@@ -106,6 +109,15 @@ public:
                 gunKeyframeIndex++;
             }
         }
+
+        if(fireKeyframeIndex < (int) fireKeyframes.size())
+        {
+            if(time > fireKeyframes[fireKeyframeIndex])
+            {
+                Fire();
+                fireKeyframeIndex++;
+            }
+        }
     }
 
     void Draw(Shader shader, glm::mat4& view, glm::mat4& projection, glm::mat4& lightSpace)
@@ -149,6 +161,11 @@ public:
         gunKeyframes.push_back(newKey);
     }
 
+    void addFireKeyframe(float firetime)
+    {
+        fireKeyframes.push_back(firetime);
+    }
+
     void Translate(glm::vec3 translation)
     {
         worldPosition = worldPosition + translation;
@@ -179,5 +196,12 @@ public:
         gunKeyframeIndex = 0;
     }
 
+    void Fire()
+    {
+        glm::mat4 model;
+        model = glm::translate(model, this->worldPosition);
+        model = glm::rotate(model, glm::angle(rotation), glm::axis(rotation));
+        turret->Fire(model);
+    }
 };
 #endif // TANK_OBJECT_H

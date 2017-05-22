@@ -17,7 +17,6 @@
 
 //Physics
 #include "../Include/CWPhysicsObject.h"
-#include "../Include/CWPhysicsLamp.h"
 #include "../Include/PhysicsWrapperMini/PhysicsObjectTypes.h"
 #include "../Include/PhysicsWrapperMini/PhysicsWorld.h"
 
@@ -114,14 +113,33 @@ int main(void)
 	PhysicsBall cameraCollider(camera.GetCameraPosition(), &world);
 	camera.addCollider(&cameraCollider);
 
+	/* Create some lights */
+    std::vector<LightSource*> lights;
+    DirectionalLight sun(glm::vec3(5.0f, -5.0f, 2.0f), glm::vec3(0.4f), glm::vec3(0.8f), glm::vec3(1.0f));
+    PointLight duskPoint(LIGHT_POS, 1.0, 0.01, 0.032, 0, glm::vec3(0.0f, 0.1f, 0.2f), glm::vec3(0.0f, 0.4f, 0.8f), glm::vec3(0.0f, 0.5f, 1.0f));
+    PointLight dawnPoint(LIGHT_POS, 1.0, 0.01, 0.032, 1, glm::vec3(0.0f, 0.2f, 0.0f), glm::vec3(0.0f, 0.8f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    lights.push_back(&sun);
+    lights.push_back(&duskPoint);
+    lights.push_back(&dawnPoint);
+
+    GLfloat cyan[3] = {0.0f, 1.0f, 1.0f};
+    TriangleMesh duskProjectileMesh(GetParticleSphere(0.5f), "na", cyan);
+    PhysicsBall duskProjectileBody(true, 0.5f, 2.0f, glm::vec3(0.0f, 10.0f, 0.0f), &world);
+    CWPhysicsLamp duskProjectile(&duskProjectileMesh, &duskProjectileBody, glm::vec3(0.0f), duskPoint);
+
+    GLfloat green[3] = {0.0f, 1.0f, 0.0f};
+    TriangleMesh dawnProjectileMesh(GetParticleSphere(0.5f), "na", green);
+    PhysicsBall dawnProjectileBody(true, 0.5f, 2.0f, glm::vec3(5.0f, 10.0f, 5.0f), &world);
+    CWPhysicsLamp dawnProjectile(&dawnProjectileMesh, &dawnProjectileBody, glm::vec3(0.0f), dawnPoint);
+
 	std::vector<CWObject*> gObjects;
 
     /* Create the first tank */
-    TankObject duskTank("Images/DuskTank/DuelTankBody_Dusk", "Images/DuskTank/DuelTankTurret_Dusk", "Images/DuskTank/DuelTankGun_Dusk", glm::vec3(0.0f, 5.0f, -30.0f), glm::quat());
+    TankObject duskTank("Images/DuskTank/DuelTankBody_Dusk", "Images/DuskTank/DuelTankTurret_Dusk", "Images/DuskTank/DuelTankGun_Dusk", glm::vec3(0.0f, 5.0f, -30.0f), glm::quat(), duskProjectile);
     gObjects.push_back(&duskTank);
 
     /* Create the second tank */
-    TankObject dawnTank("Images/DawnTank/DuelTankBody_Dawn", "Images/DawnTank/DuelTankTurret_Dawn", "Images/DawnTank/DuelTankGun_Dawn", glm::vec3(0.0f, 5.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+    TankObject dawnTank("Images/DawnTank/DuelTankBody_Dawn", "Images/DawnTank/DuelTankTurret_Dawn", "Images/DawnTank/DuelTankGun_Dawn", glm::vec3(0.0f, 5.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)), dawnProjectile);
     gObjects.push_back(&dawnTank);
 
     /* Create the first transport */
@@ -157,26 +175,7 @@ int main(void)
     GraphicsObject mainIslandWaterfallObject(&mainIslandWaterfallMesh, glm::vec3(0.0f), glm::quat());
     gObjects.push_back(&mainIslandWaterfallObject);
 
-    /* Create some lights */
-    std::vector<LightSource*> lights;
-    DirectionalLight sun(glm::vec3(5.0f, -5.0f, 2.0f), glm::vec3(0.4f), glm::vec3(0.8f), glm::vec3(1.0f));
-    PointLight duskPoint(LIGHT_POS, 1.0, 0.01, 0.032, 0, glm::vec3(0.0f, 0.1f, 0.2f), glm::vec3(0.0f, 0.4f, 0.8f), glm::vec3(0.0f, 0.5f, 1.0f));
-    PointLight dawnPoint(LIGHT_POS, 1.0, 0.01, 0.032, 1, glm::vec3(0.0f, 0.2f, 0.0f), glm::vec3(0.0f, 0.8f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    //SpotLight spotLight(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), glm::vec3(0.2f, 0.2f, 0.2f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f));
-    lights.push_back(&sun);
-    lights.push_back(&duskPoint);
-    lights.push_back(&dawnPoint);
-    //lights.push_back(&spotLight);
 
-    GLfloat cyan[3] = {0.0f, 1.0f, 1.0f};
-    TriangleMesh duskProjectileMesh(GetParticleSphere(0.5f), "na", cyan);
-    PhysicsBall duskProjectileBody(true, 0.5f, 2.0f, glm::vec3(0.0f, 10.0f, 0.0f), &world);
-    CWPhysicsLamp duskProjectile(&duskProjectileMesh, &duskProjectileBody, glm::vec3(0.0f), duskPoint);
-
-    GLfloat green[3] = {0.0f, 1.0f, 0.0f};
-    TriangleMesh dawnProjectileMesh(GetParticleSphere(0.5f), "na", green);
-    PhysicsBall dawnProjectileBody(true, 0.5f, 2.0f, glm::vec3(5.0f, 10.0f, 5.0f), &world);
-    CWPhysicsLamp dawnProjectile(&dawnProjectileMesh, &dawnProjectileBody, glm::vec3(0.0f), dawnPoint);
 
 	/* Main loop */
 	while(!glfwWindowShouldClose(window) && stillRunning)

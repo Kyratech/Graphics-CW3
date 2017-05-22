@@ -68,6 +68,13 @@ public:
     {
         cannon->SetCannonRotation(angle);
     }
+
+    void Fire(glm::mat4 tankModelMatrix)
+    {
+        tankModelMatrix = glm::translate(tankModelMatrix, turretPosition);
+        tankModelMatrix = glm::rotate(tankModelMatrix, glm::angle(turretRotation), glm::axis(turretRotation));
+        cannon->Fire(tankModelMatrix);
+    }
 };
 
 #endif // TURRET_OBJECT_H

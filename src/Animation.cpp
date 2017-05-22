@@ -93,6 +93,9 @@ void SetupAnimation(TankObject &duskTank, TankObject &dawnTank, TransportObject 
     dawnTransport.addKeyframe({dawnTeamLanding, glm::quat(), 34.0f});
     dawnTransport.addKeyframe({dawnTeamSpawn, glm::quat(), 54.0f});
 
+    duskTank.addFireKeyframe(36.0f);
+    dawnTank.addFireKeyframe(35.0f);
+
     /* Tanks attack */
 
     glm::vec3 duskStart = duskTeamLanding + glm::vec3(0.0f, -16.0f, 2.0f);
@@ -102,9 +105,53 @@ void SetupAnimation(TankObject &duskTank, TankObject &dawnTank, TransportObject 
     dawnTank.addKeyframe({dawnStart, dawnRotation, 33.0f});
 
     duskTank.addKeyframe({dawnStart, glm::angleAxis(glm::radians(5.0f), glm::vec3(1.0f, 0.0f, 0.0f)), 38.5f});
-    dawnTank.addKeyframe({dawnStart + glm::vec3(-20.0f, 0.0f, 0.0f), glm::angleAxis(glm::radians(10.0f), glm::normalize(glm::vec3(0.0f, -0.5f, 1.0f))) * dawnRotation, 35.0f});
+    duskTank.addTurretKeyframe({0.0f, 35.0f});
+    duskTank.addTurretKeyframe({-30.0f, 38.0f});
+
+    dawnTank.addKeyframe({dawnStart + glm::vec3(-20.0f, 0.0f, 0.0f), glm::angleAxis(glm::radians(30.0f), glm::normalize(glm::vec3(0.0f, -0.5f, -1.0f))) * dawnRotation, 35.0f});
+    dawnTank.addKeyframe({dawnStart + glm::vec3(-30.0f, 0.0f, -20.0f), glm::angleAxis(glm::radians(60.0f), glm::normalize(glm::vec3(0.0f, -1.0f, -0.5f))) * dawnRotation, 36.0f});
     dawnTank.addTurretKeyframe({0.0f, 34.0f});
     dawnTank.addTurretKeyframe({-45.0f, 35.5f});
+
+    duskTank.addKeyframe({dawnStart, dawnRotation, 40.0f});
+    duskTank.addKeyframe({dawnStart + glm::vec3(-10.0f, 0.0f, -20.0f), glm::angleAxis(glm::radians(-10.0f), glm::vec3(0.0f, 0.0f, 1.0f)) * dawnRotation, 42.0f});
+    duskTank.addKeyframe({glm::vec3(-10.0f, 4.0f, -60.0f), glm::angleAxis(glm::radians(-120.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::angleAxis(glm::radians(-10.0f), glm::vec3(0.0f, 0.0f, 1.0f)) * dawnRotation, 48.0f});
+    duskTank.addKeyframe({glm::vec3(-10.0f, 4.0f, -60.0f), glm::angleAxis(glm::radians(65.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 49.0f});
+    duskTank.addTurretKeyframe({-30.0f, 39.0f});
+    duskTank.addTurretKeyframe({20.0f, 41.0f});
+    duskTank.addTurretKeyframe({-40.0f, 50.0f});
+    duskTank.addTurretKeyframe({10.0f, 53.0f});
+    duskTank.addFireKeyframe(45.0f);
+
+    dawnTank.addKeyframe({glm::vec3(30.0f, 4.0f, -50.0f), glm::angleAxis(glm::radians(60.0f), glm::normalize(glm::vec3(0.0f, -1.0f, 0.0f))) * dawnRotation, 44.0f});
+    dawnTank.addTurretKeyframe({-60.0f, 36.0f});
+    dawnTank.addTurretKeyframe({-125.0f, 39.5f});
+    dawnTank.addTurretKeyframe({0.0f, 49.0f});
+    dawnTank.addFireKeyframe(39.0f);
+    dawnTank.addKeyframe({glm::vec3(30.0f, 4.0f, -50.0f), glm::angleAxis(glm::radians(-110.0f), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f))), 49.0f});
+
+    /* Final clash */
+
+    duskTank.addKeyframe({glm::vec3(-10.0f, 4.0f, -60.0f), glm::angleAxis(glm::radians(65.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 52.0f});
+    duskTank.addKeyframe({glm::vec3(8.0f, 4.0f, -57.0f), glm::angleAxis(glm::radians(65.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 53.0f});
+    duskTank.addKeyframe({glm::vec3(8.0f, 4.0f, -58.0f), glm::angleAxis(glm::radians(65.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 54.0f});
+    duskTank.addKeyframe({glm::vec3(8.0f, 4.0f, -57.5f), glm::angleAxis(glm::radians(65.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 55.0f});
+    duskTank.addKeyframe({glm::vec3(8.0f, 4.0f, -60.0f), glm::angleAxis(glm::radians(65.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 57.0f});
+    duskTank.addKeyframe({glm::vec3(8.0f, 4.0f, -76.0f), glm::angleAxis(glm::radians(65.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 61.0f});
+    duskTank.addKeyframe({glm::vec3(8.0f, 2.0f, -79.0f), glm::angleAxis(glm::radians(-30.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::angleAxis(glm::radians(65.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 61.5f});
+    duskTank.addKeyframe({glm::vec3(8.0f, -2.0f, -81.0f), glm::angleAxis(glm::radians(-60.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::angleAxis(glm::radians(65.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 62.0f});
+    duskTank.addKeyframe({glm::vec3(8.0f, -20.0f, -84.0f), glm::angleAxis(glm::radians(-180.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::angleAxis(glm::radians(65.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 65.0f});
+    duskTank.addKeyframe({glm::vec3(8.0f, -200.0f, -90.0f), glm::angleAxis(glm::radians(-180.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::angleAxis(glm::radians(65.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 80.0f});
+    duskTank.addKeyframe({glm::vec3(8.0f, -600.0f, -90.0f), glm::angleAxis(glm::radians(-180.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::angleAxis(glm::radians(65.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 81.0f});
+
+    dawnTank.addKeyframe({glm::vec3(30.0f, 4.0f, -50.0f), glm::angleAxis(glm::radians(-110.0f), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f))), 52.0f});
+    dawnTank.addKeyframe({glm::vec3(12.0f, 4.0f, -54.0f), glm::angleAxis(glm::radians(-110.0f), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f))), 53.0f});
+    dawnTank.addKeyframe({glm::vec3(12.0f, 4.0f, -55.0f), glm::angleAxis(glm::radians(-110.0f), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f))), 54.0f});
+    dawnTank.addKeyframe({glm::vec3(12.0f, 4.0f, -54.5f), glm::angleAxis(glm::radians(-110.0f), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f))), 55.0f});
+    dawnTank.addKeyframe({glm::vec3(12.0f, 4.0f, -57.0f), glm::angleAxis(glm::radians(-110.0f), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f))), 57.0f});
+    dawnTank.addKeyframe({glm::vec3(12.0f, 4.0f, -73.0f), glm::angleAxis(glm::radians(-110.0f), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f))), 61.0f});
+    dawnTank.addKeyframe({glm::vec3(14.0f, 4.0f, -70.0f), glm::angleAxis(glm::radians(-110.0f), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f))), 62.0f});
+    dawnTank.addKeyframe({glm::vec3(15.0f, 4.0f, -66.0f), glm::angleAxis(glm::radians(-140.0f), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f))), 64.0f});
 
     /*
     duskTank.addTurretKeyframe({0.0f, 0.0f});
