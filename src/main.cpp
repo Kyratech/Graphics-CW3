@@ -161,7 +161,7 @@ int main(void)
 
     const struct Material floatingIsland1Mat = {"Images/Rock/FloatingIsland1DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png", 8.0f};
     OBJMesh floatingIsland1Mesh("Models/FloatingIsland1.obj", floatingIsland1Mat);
-    GraphicsObject floatingIslandObject(&floatingIsland1Mesh, glm::vec3(-10.0f, 10.0f, -35.0f), glm::quat());
+    GraphicsObject floatingIslandObject(&floatingIsland1Mesh, glm::vec3(40.0f, 30.0f, -25.0f), glm::quat());
     gObjects.push_back(&floatingIslandObject);
 
     PhysicsConvexMesh mainIslandCollider(false, "Models/MainIslandCollision.obj", 1.0f, glm::vec3(0.0f), glm::vec3(0.0f), &world);
@@ -170,12 +170,32 @@ int main(void)
     CWPhysicsObject mainIslandObject(&mainIslandMesh, &mainIslandCollider, glm::vec3(0.0f));
     gObjects.push_back(&mainIslandObject);
 
+    PhysicsConvexMesh smallIslandCollider(false, "Models/SmallIsland.obj", 1.0f, glm::vec3(50.0f, 100.0f, -10.0f), glm::vec3(0.0f, 30.0f, 0.0f), &world);
+    const struct Material smallIslandMat = {"Images/Rock/MainIsland_DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png", 8.0f};
+    OBJMesh smallIslandMesh("Models/SmallIsland.obj", smallIslandMat);
+    CWPhysicsObject smallIslandObject(&smallIslandMesh, &smallIslandCollider, glm::vec3(0.0f));
+    gObjects.push_back(&smallIslandObject);
+
+    PhysicsConvexMesh smallIslandCollider2(false, "Models/MediumIsland.obj", 1.0f, glm::vec3(-40.0f, -30.0f, 60.0f), glm::vec3(0.0f, -40.0f, 0.0f), &world);
+    const struct Material smallIslandMat2 = {"Images/Rock/MainIsland_DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png", 8.0f};
+    OBJMesh smallIslandMesh2("Models/MediumIsland.obj", smallIslandMat2);
+    CWPhysicsObject smallIslandObject2(&smallIslandMesh2, &smallIslandCollider2, glm::vec3(0.0f));
+    gObjects.push_back(&smallIslandObject2);
+
     const struct Material mainIslandWaterfallMat = {"Images/Rock/River_DIFFUSE.png", "Images/Rock/River_SPECULAR.png", 16.0f};
     OBJMesh mainIslandWaterfallMesh("Models/MainIslandWaterfall.obj", mainIslandWaterfallMat);
     GraphicsObject mainIslandWaterfallObject(&mainIslandWaterfallMesh, glm::vec3(0.0f), glm::quat());
     gObjects.push_back(&mainIslandWaterfallObject);
 
+    const struct Material smallWaterfallMat = {"Images/Rock/River_DIFFUSE.png", "Images/Rock/River_SPECULAR.png", 16.0f};
+    OBJMesh smallWaterfallMesh("Models/SmallWaterfall.obj", smallWaterfallMat);
+    GraphicsObject smallWaterfallObject(&smallWaterfallMesh, glm::vec3(50.0f, 100.0f, -10.0f), glm::angleAxis(glm::radians(30.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+    gObjects.push_back(&smallWaterfallObject);
 
+    const struct Material smallWaterfallMat2 = {"Images/Rock/River_DIFFUSE.png", "Images/Rock/River_SPECULAR.png", 16.0f};
+    OBJMesh smallWaterfallMesh2("Models/MediumWaterfall.obj", smallWaterfallMat2);
+    GraphicsObject smallWaterfallObject2(&smallWaterfallMesh2, glm::vec3(-40.0f, -30.0f, 60.0f), glm::angleAxis(glm::radians(-40.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+    gObjects.push_back(&smallWaterfallObject2);
 
 	/* Main loop */
 	while(!glfwWindowShouldClose(window) && stillRunning)
@@ -223,7 +243,7 @@ int main(void)
         glBindTexture(GL_TEXTURE_2D, sun.depthMap);
 		glUniform1i(glGetUniformLocation(celShader.getShaderProgram(), "shadowMap"), 2);
 
-		for(int i = 0; i < gObjects.size() - 1; i++)
+		for(int i = 0; i < gObjects.size() - 3; i++)
         {
             gObjects[i]->MotionTween(simulationTime);
             gObjects[i]->Draw(celShader, view, projection, lightSpaceMatrix);
@@ -240,10 +260,13 @@ int main(void)
             lights[i]->ApplyLighting(waterfallShader);
         }
 
-        mainIslandWaterfallObject.Draw(waterfallShader, view, projection, lightSpaceMatrix);
         GLint waterfallTimerLocation = glGetUniformLocation(waterfallShader.getShaderProgram(), "timeOffset");
         glUniform1f(waterfallTimerLocation, currentFrame * -0.1);
-        glActiveTexture(GL_TEXTURE2);
+        mainIslandWaterfallObject.Draw(waterfallShader, view, projection, lightSpaceMatrix);
+		smallWaterfallObject.Draw(waterfallShader, view, projection, lightSpaceMatrix);
+		smallWaterfallObject2.Draw(waterfallShader, view, projection, lightSpaceMatrix);
+
+		glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, sun.depthMap);
 		glUniform1i(glGetUniformLocation(waterfallShader.getShaderProgram(), "shadowMap"), 2);
 
