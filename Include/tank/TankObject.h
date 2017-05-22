@@ -173,6 +173,10 @@ public:
     {
         worldPosition = initialPosition;
         rotation = initialOrientation;
+
+        keyframeIndex = 0;
+        turretKeyframeIndex = 0;
+        gunKeyframeIndex = 0;
     }
 
 };

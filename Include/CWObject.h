@@ -2,6 +2,8 @@
 #define CW_OBJECT_H
 
 #include <vector>
+#include "Introduction.h"
+
 class LightSource;
 
 class CWObject

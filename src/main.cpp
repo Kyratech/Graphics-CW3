@@ -11,7 +11,9 @@
 #include "../Include/GraphicsObject.h"
 #include "../Include/OBJMesh.h"
 #include "../Include/tank/TankObject.h"
+#include "../Include/transport/TransportObject.h"
 #include "../Include/Skybox.h"
+#include "../Include/Animation.h"
 
 //Physics
 #include "../Include/CWPhysicsObject.h"
@@ -115,18 +117,12 @@ int main(void)
     /* Create the first tank */
     TankObject duskTank("Images/DuskTank/DuelTankBody_Dusk", "Images/DuskTank/DuelTankTurret_Dusk", "Images/DuskTank/DuelTankGun_Dusk", glm::vec3(0.0f, 5.0f, -30.0f), glm::quat());
     gObjects.push_back(&duskTank);
-    duskTank.addTurretKeyframe({0.0f, 0.0f});
-    duskTank.addTurretKeyframe({45.0f, 10.0f});
-    duskTank.addTurretKeyframe({90.0f, 15.0f});
-    duskTank.addCannonKeyframe({0.0f, 0.0f});
-    duskTank.addCannonKeyframe({0.0f, 7.5f});
-    duskTank.addCannonKeyframe({-60.0f, 17.5f});
 
     /* Create the second tank */
     TankObject dawnTank("Images/DawnTank/DuelTankBody_Dawn", "Images/DawnTank/DuelTankTurret_Dawn", "Images/DawnTank/DuelTankGun_Dawn", glm::vec3(0.0f, 5.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
     gObjects.push_back(&dawnTank);
 
-    /* Create a tank transport */
+    /* Create a tank transport
     const struct Material duskTransportMat = {"Images/DuskTransport/Transport_DIFFUSE.png", "Images/DuskTransport/Transport_SPECULAR.png", 16.0f};
     OBJMesh duskTransportMesh("Models/TransportOffset.obj", duskTransportMat);
     GraphicsObject duskTransportObject(&duskTransportMesh, glm::vec3(0.0f, 10.0f, -30.0f), glm::quat());
@@ -138,25 +134,29 @@ int main(void)
     gObjects.push_back(&duskTransportArm1Object);
     GraphicsObject duskTransportArm2Object(&duskTransportArmMesh, glm::vec3(-1.0f, 10.0f, -30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
     gObjects.push_back(&duskTransportArm2Object);
+    */
 
+    TransportObject duskTransport("Images/DuskTransport/Transport", glm::vec3(0.0f, 10.0f, -30.0f), glm::quat());
+    gObjects.push_back(&duskTransport);
+
+    TransportObject dawnTransport("Images/DawnTransport/Transport_Dawn", glm::vec3(0.0f, 5.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+    gObjects.push_back(&dawnTransport);
+
+    /* Second tank transport
     const struct Material dawnTransportMat = {"Images/DawnTransport/Transport_Dawn_DIFFUSE.png", "Images/DawnTransport/Transport_Dawn_SPECULAR.png", 16.0f};
     OBJMesh dawnTransportMesh("Models/TransportOffset.obj", dawnTransportMat);
     GraphicsObject dawnTransportObject(&dawnTransportMesh, glm::vec3(0.0f, 10.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
     gObjects.push_back(&dawnTransportObject);
-    struct CWKeyframe key1 = {glm::vec3(0.0f, 10.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 0.0f};
-    struct CWKeyframe key2 = {glm::vec3(20.0f, 10.0f, 20.0f), glm::angleAxis(glm::radians(60.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 10.0f};
-    struct CWKeyframe key3 = {glm::vec3(40.0f, 10.0f, 10.0f), glm::angleAxis(glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 20.0f};
-    dawnTransportObject.addKeyframe(key1);
-    dawnTransportObject.addKeyframe(key2);
-    dawnTransportObject.addKeyframe(key3);
 
-    GraphicsObject dawnTransportArm1Object(&duskTransportArmMesh, glm::vec3(1.0f, 10.0f, 30.0f), glm::quat());
-    gObjects.push_back(&dawnTransportArm1Object);
-    GraphicsObject dawnTransportArm2Object(&duskTransportArmMesh, glm::vec3(-1.0f, 10.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
-    gObjects.push_back(&dawnTransportArm2Object);
+    //GraphicsObject dawnTransportArm1Object(&duskTransportArmMesh, glm::vec3(1.0f, 10.0f, 30.0f), glm::quat());
+    //gObjects.push_back(&dawnTransportArm1Object);
+    //GraphicsObject dawnTransportArm2Object(&duskTransportArmMesh, glm::vec3(-1.0f, 10.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+    //gObjects.push_back(&dawnTransportArm2Object);*/
+
+    SetupAnimation(duskTank, dawnTank, duskTransport, dawnTransport);
 
     /* Environment objects */
-    PhysicsConvexMesh rockCollider(true, "Models/Rock1.obj", 1.0f, glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f), &world);
+    PhysicsConvexMesh rockCollider(false, "Models/Rock1.obj", 1.0f, glm::vec3(20.0f, 0.0f, 60.0f), glm::vec3(0.0f), &world);
     const struct Material rock1Mat = {"Images/Rock/Rock1_DIFFUSE.png", "Images/Rock/Rock1_SPECULAR.png", 8.0f};
     OBJMesh rock1Mesh("Models/Rock1.obj", rock1Mat);
     CWPhysicsObject rockObject(&rock1Mesh, &rockCollider, glm::vec3(0.0f));

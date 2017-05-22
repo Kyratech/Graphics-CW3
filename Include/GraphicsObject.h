@@ -2,6 +2,7 @@
 #define GRAPHICS_OBJECT_H
 
 #include "CWObject.h"
+#include "Mesh.h"
 
 class GraphicsObject :public CWObject
 {
