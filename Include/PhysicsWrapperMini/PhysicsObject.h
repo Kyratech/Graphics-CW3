@@ -35,7 +35,7 @@ public:
 	void applyForce(glm::vec3 force);
 	void applyImpulse(glm::vec3 impulse);
 
-	void setCollisionID(int ID);
+	void setCollisionID(intptr_t ID);
 	int getCollisionID();
 };
 
