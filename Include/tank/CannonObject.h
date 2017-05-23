@@ -23,6 +23,11 @@ public:
         mesh = myMesh;
     }
 
+    ~CannonObject()
+    {
+        delete mesh;
+    }
+
     void Draw(Shader shader, glm::mat4 view, glm::mat4 projection, glm::mat4 turretModelMatrix)
     {
         //glm::mat4 model;

@@ -55,8 +55,6 @@ public:
     {
         delete turret;
         delete tankBodyMesh;
-        delete tankTurretMesh;
-        delete tankCannonMesh;
     }
 
     virtual void MotionTween(float time)

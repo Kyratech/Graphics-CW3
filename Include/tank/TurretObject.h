@@ -24,6 +24,7 @@ public:
     ~TurretObject()
     {
         delete cannon;
+        delete mesh;
     }
 
     void Draw(Shader shader, glm::mat4 view, glm::mat4 projection, glm::mat4 tankModelMatrix)
