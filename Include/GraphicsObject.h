@@ -111,6 +111,7 @@ public:
     {
         worldPosition = initialPosition;
         rotation = initialOrientation;
+        keyframeIndex = 0;
     }
 };
 

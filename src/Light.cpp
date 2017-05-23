@@ -49,7 +49,7 @@ void DirectionalLight::ApplyLighting(Shader shader)
     glUniform3fv(lightSpecularLocation, 1, glm::value_ptr(specularComponent));
 }
 
-glm::mat4 DirectionalLight::CalculateShadows(Shader shader, std::vector<CWObject*> &objects, glm::mat4& view, glm::mat4& projection, const std::vector<LightSource*> &lights)
+glm::mat4 DirectionalLight::CalculateShadows(Shader shader, std::vector<CWObject*> objects, glm::mat4& view, glm::mat4& projection, const std::vector<LightSource*> &lights)
 {
     GLfloat nearPlane = 0.0f;
     GLfloat farPlane = 120.0f;

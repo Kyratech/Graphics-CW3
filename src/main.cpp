@@ -54,9 +54,11 @@ GLfloat lastFrame = 0.0f;
 
 GLfloat simulationTime = 0.0f;
 
-//For scene selection
-static int e = 0;
+//For camera selection
+static int cameraMode = 0;
 bool stillRunning = true;
+
+std::vector<CWObject*> gObjects;
 
 int main(void)
 {
@@ -130,8 +132,6 @@ int main(void)
     TriangleMesh dawnProjectileMesh(GetParticleSphere(0.5f), "na", green);
     PhysicsBall dawnProjectileBody(true, 0.5f, 2.0f, glm::vec3(5.0f, 10.0f, 5.0f), &world);
     CWPhysicsLamp dawnProjectile(&dawnProjectileMesh, &dawnProjectileBody, glm::vec3(0.0f), dawnPoint);
-
-	std::vector<CWObject*> gObjects;
 
     /* Create the first tank */
     TankObject duskTank("Images/DuskTank/DuelTankBody_Dusk", "Images/DuskTank/DuelTankTurret_Dusk", "Images/DuskTank/DuelTankGun_Dusk", glm::vec3(0.0f, 5.0f, -30.0f), glm::quat(), duskProjectile);
@@ -279,6 +279,16 @@ int main(void)
 	return 0;
 }
 
+void ResetAnimation()
+{
+    simulationTime = 0;
+
+    for(int i = 0; i < gObjects.size(); i++)
+    {
+        gObjects[i]->ResetObject();
+    }
+}
+
 // RenderQuad() Renders a 1x1 quad in NDC, best used for framebuffer color targets
 // and post-processing effects.
 GLuint quadVAO = 0;
@@ -345,18 +355,16 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 		keys[key] = true;
 
 		//Additional checks for scene selection
-		if(keys[GLFW_KEY_A])
-            e = 0;
-        else if(keys[GLFW_KEY_B])
-            e = 1;
-        else if(keys[GLFW_KEY_C])
-            e = 2;
-        else if(keys[GLFW_KEY_D])
-            e = 3;
-        else if(keys[GLFW_KEY_E])
-            e = 4;
-        else if(keys[GLFW_KEY_F])
-            e = 5;
+		if(keys[GLFW_KEY_E] || keys[GLFW_KEY_M])
+            cameraMode = 0; //Free cam
+        else if(keys[GLFW_KEY_P])
+            cameraMode = 1; //Screenshot
+        else if(keys[GLFW_KEY_L])
+            cameraMode = 2; //Top-down
+        else if(keys[GLFW_KEY_T])
+            cameraMode = 3;
+        else if(keys[GLFW_KEY_R])
+            ResetAnimation();
         else if(keys[GLFW_KEY_Q] || keys[GLFW_KEY_ESCAPE])
             stillRunning = false; //Set the flag to close next frame
 	}
@@ -364,7 +372,6 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 	{
 		keys[key] = false;
 	}
-
 }
 
 /*
