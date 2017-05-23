@@ -192,6 +192,7 @@ public:
         keyframeIndex = 0;
         turretKeyframeIndex = 0;
         gunKeyframeIndex = 0;
+        fireKeyframeIndex = 0;
     }
 
     void Fire()

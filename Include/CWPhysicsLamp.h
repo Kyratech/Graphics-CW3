@@ -8,13 +8,29 @@ class CWPhysicsLamp: public CWPhysicsObject
 {
 private:
     PointLight &light;
+    float timer;
 public:
     CWPhysicsLamp(Mesh* myMesh, PhysicsObject* myPhysicsObject, glm::vec3 offset, PointLight &myLight)
-    : CWPhysicsObject(myMesh, myPhysicsObject, offset), light(myLight) { }
+    : CWPhysicsObject(myMesh, myPhysicsObject, offset), light(myLight)
+    {
+        timer = 0.0f;
+    }
 
-    void UpdateLight()
+    void UpdateLight(float dTime)
     {
         light.SetPosition(physicsObject->getPosition());
+
+        //Reset the projectile if it has been travelling for too long
+        if(timer > 0.0f)
+        {
+            timer -= dTime;
+
+            if(timer <= 0.0f)
+            {
+                this->ResetObject();
+            }
+        }
+
     }
 
     virtual void Draw(Shader shader, glm::mat4& view, glm::mat4& projection, glm::mat4& lightSpace)
@@ -39,7 +55,12 @@ public:
 
     void Fire(glm::vec3 newPos, glm::vec3 impulse)
     {
+        timer = 5.0f;
+
         btRigidBody* rigidBody = physicsObject->getRigidBody();
+
+        //If the object had come to rest, it may have deactivated. Reactivate it so that the world starts updating it again.
+        rigidBody->activate();
 
         rigidBody->clearForces();
 
@@ -51,8 +72,7 @@ public:
         btTransform newTrans;
         newTrans.setOrigin(btVector3(newPos.x, newPos.y, newPos.z));
 
-        //If the object had come to rest, it may have deactivated. Reactivate it so that the world starts updating it again.
-        rigidBody->activate();
+
         //Teleport the object to its initial position
         rigidBody->setWorldTransform(newTrans);
 

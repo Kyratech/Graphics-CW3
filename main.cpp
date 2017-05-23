@@ -198,8 +198,8 @@ int main(void)
 
 		world.stepWorld(deltaTime);
 
-		duskProjectile.UpdateLight();
-		dawnProjectile.UpdateLight();
+		duskProjectile.UpdateLight(deltaTime);
+		dawnProjectile.UpdateLight(deltaTime);
 
 		camera.cameraMove(deltaTime);
 		tourCamera.MotionTween(simulationTime);
