@@ -120,6 +120,23 @@ class FPS_Camera
             }
 		}
 
+		void ResetCamera()
+		{
+		    btRigidBody* body = collider->getRigidBody();
+            body->clearForces();
+
+            //Stop the object moving
+            btVector3 zeroVector(0, 0, 0);
+            body->setLinearVelocity(zeroVector);
+            body->setAngularVelocity(zeroVector);
+
+            btTransform newTrans;
+            newTrans.setOrigin(btVector3(0, 10, 0));
+
+            //Teleport the object to its initial position
+            body->setWorldTransform(newTrans);
+		}
+
 		void keyboard_input(Camera_Directions direction, GLfloat deltaTime)
 		{
 			glm::vec3 frontGrounded(this->Front.x, 0.0f, this->Front.z);

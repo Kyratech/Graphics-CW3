@@ -365,6 +365,8 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
             cameraMode = 3;
         else if(keys[GLFW_KEY_R])
             ResetAnimation();
+        else if(keys[GLFW_KEY_Z])
+            camera.ResetCamera();
         else if(keys[GLFW_KEY_Q] || keys[GLFW_KEY_ESCAPE])
             stillRunning = false; //Set the flag to close next frame
 	}
