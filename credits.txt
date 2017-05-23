@@ -1,0 +1,10 @@
+External code used in CW_3:
+- TinyObjLoader, by syoyo.
+	>Used to load .obj files for displaying
+	>Available here: https://github.com/syoyo/tinyobjloader
+- stb_image, by nothings.
+	>Used to load image files for use as textures
+	>Available here: https://github.com/nothings/stb
+	
+All models made by me, using Blender.
+All textures made by me, using Photoshop.

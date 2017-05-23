@@ -103,7 +103,6 @@ int main(void)
 	Shader unlitShader("Shaders/UnlitShader.vert", "Shaders/UnlitShader.frag");
 	//For shadows
 	Shader depthShader("Shaders/DepthShader.vert", "Shaders/DepthShader.frag");
-	Shader debugDepthShader("Shaders/DebugDepth.vert", "Shaders/DebugDepth.frag");
 
 	Skybox sky("Images/Skybox/Skybox");
 
@@ -277,14 +276,6 @@ int main(void)
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-        // Render Depth map to quad
-        debugDepthShader.Use();
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, sun.depthMap);
-        glUniform1f(glGetUniformLocation(debugDepthShader.getShaderProgram(), "depthMap"), 0);
-        //RenderQuad();
-
 		glfwSwapBuffers(window);
 	}
 
@@ -303,37 +294,6 @@ void ResetAnimation()
         gObjects[i]->ResetObject();
     }
     tourCamera.ResetObject();
-}
-
-// RenderQuad() Renders a 1x1 quad in NDC, best used for framebuffer color targets
-// and post-processing effects.
-GLuint quadVAO = 0;
-GLuint quadVBO;
-void RenderQuad()
-{
-    if (quadVAO == 0)
-    {
-        GLfloat quadVertices[] = {
-            // Positions        // Texture Coords
-            -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
-            -1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
-             1.0f,  1.0f, 0.0f,  1.0f, 1.0f,
-             1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
-        };
-        // Setup plane VAO
-        glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
-        glBindVertexArray(quadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-    }
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
 }
 
 void HandleInput()

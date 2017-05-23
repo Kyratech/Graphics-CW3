@@ -24,7 +24,7 @@ public:
         //Print any errors raised by the OBJ loader
         if (!err.empty())
         {
-          std::cerr << err << std::endl;
+          //std::cerr << err << std::endl;
         }
 
         //Exit application if could not load OBJ
