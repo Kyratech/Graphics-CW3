@@ -207,11 +207,24 @@ int main(void)
 
 		/* Generate the view matrix */
 		glm::mat4 view;
-		view = camera.GetViewMatrix();
 		/* Generate the projection matrix */
 		glm::mat4 projection;
-		projection = glm::perspective(glm::radians(camera.Fov), (GLfloat)width / (GLfloat)height, 0.1f, 400.0f);
 
+		switch(cameraMode)
+		{
+        default:
+        case 0:
+            view = camera.GetViewMatrix();
+            break;
+        case 1:
+            view = glm::lookAt(glm::vec3(36.7f, 1.54f, 57.6f), glm::vec3(36.1f, 1.99f, 56.93f), glm::vec3(0.28f, 0.89f, 0.35f));
+            break;
+        case 2:
+            view = glm::lookAt(glm::vec3(0.0f, 150.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            break;
+		}
+
+        projection = glm::perspective(glm::radians(camera.Fov), (GLfloat)width / (GLfloat)height, 0.1f, 400.0f);
 		glm::mat4 lightSpaceMatrix = sun.CalculateShadows(depthShader, gObjects, view, projection, lights);
 
 		/* Rendering commands */
@@ -359,6 +372,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
             cameraMode = 0; //Free cam
         else if(keys[GLFW_KEY_P])
             cameraMode = 1; //Screenshot
+            //camera.PrintCoords();
         else if(keys[GLFW_KEY_L])
             cameraMode = 2; //Top-down
         else if(keys[GLFW_KEY_T])

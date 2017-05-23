@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "PhysicsWrapperMini/PhysicsObjectTypes.h"
+#include <iostream>
 
 enum Camera_Directions
 {
@@ -164,6 +165,14 @@ class FPS_Camera
             {
                 this->Position = collider->getPosition();
             }
+		}
+
+		void PrintCoords()
+		{
+            std::cout << this->Position.x << ", " << this->Position.y << ", " << this->Position.z << std::endl;
+            glm::vec3 dir = this->Position + this->Front;
+            std::cout << dir.x << ", " << dir.y << ", " << dir.z << std::endl;
+            std::cout << this->Up.x << ", " << this->Up.y << ", " << this->Up.z << std::endl;
 		}
 
 	private:
