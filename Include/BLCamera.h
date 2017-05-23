@@ -2,23 +2,24 @@
 #define CAMERA3D_H
 
 #include "Introduction.h"
-
-enum Camera_Directions
-{
-	FORWARD,
-	BACKWARD,
-	LEFT,
-	RIGHT
-};
-
-const GLfloat PITCH_DEFAULT = -45.0f;
-const GLfloat YAW_DEFAULT = 20.0f;
-const GLfloat PAN_SPEED_DEFAULT = 0.01f;
-const GLfloat SENSITIVITY_DEFAULT = 0.25f;
-const GLfloat V_FOV_DEFAULT = 60.0f;
+#include <vector>
 
 class ThreeD_Camera
 {
+private:
+    std::vector<struct CameraKeyframe> keyframes;
+    int keyframeIndex;
+
+	void updateCameraVectors()
+	{
+		glm::vec3 cameraFront;
+		cameraFront = glm::vec3(Target - Position);
+
+		this->Front = glm::normalize(cameraFront);
+		this->Right = glm::normalize(glm::cross(this->Front, this->WorldUp));
+		this->Up = glm::normalize(glm::cross(this->Right, this->Front));
+	}
+
 public:
 	glm::vec3 Position;
 	glm::vec3 Front;
@@ -31,11 +32,9 @@ public:
 	GLfloat Yaw;
 	GLfloat Distance;
 
-	GLfloat PanSpeed;
-	GLfloat MouseSensitivity;
 	GLfloat Fov;
 
-	ThreeD_Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), GLfloat yaw = YAW_DEFAULT, GLfloat pitch = PITCH_DEFAULT) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), Target(glm::vec3(0.0f, 0.0f, 0.0f)), PanSpeed(PAN_SPEED_DEFAULT), MouseSensitivity(SENSITIVITY_DEFAULT), Fov(V_FOV_DEFAULT)
+	ThreeD_Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), GLfloat yaw = YAW_DEFAULT, GLfloat pitch = PITCH_DEFAULT) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), Target(glm::vec3(0.0f, 0.0f, 0.0f)), Fov(V_FOV_DEFAULT)
 	{
 		this->Position = position;
 		this->WorldUp = up;
@@ -43,8 +42,6 @@ public:
 		this->Pitch = pitch;
 		Distance = glm::length(this->Position - this->Target);
 		this->updateCameraVectors();
-
-		std::cout << "CameraLocation: " << Position.x << "," << Position.y << "," << Position.z << std::endl;
 	}
 
 	glm::mat4 GetViewMatrix()
@@ -57,59 +54,38 @@ public:
 	    return Position;
 	}
 
-	void move_camera(GLfloat deltaX, GLfloat deltaY)
-	{
-		//Reduce strength of mouse movement
-		deltaX *= this->MouseSensitivity;
-		deltaY *= this->MouseSensitivity;
+	virtual void MotionTween(float time)
+    {
+        if(keyframeIndex < (int) keyframes.size() - 1)
+        {
+            float timeDiff = keyframes[keyframeIndex + 1].time - keyframes[keyframeIndex].time;
+            float timeNow = time - keyframes[keyframeIndex].time;
+            float tweenFactor = timeNow / timeDiff;
 
-		this->Yaw += deltaX;
-		this->Pitch += deltaY;
+            glm::vec3 posDiff = keyframes[keyframeIndex + 1].position - keyframes[keyframeIndex].position;
+            this->Position = keyframes[keyframeIndex].position + posDiff * tweenFactor;
 
-		if (this->Pitch > 89.0f)
-			this->Pitch = 89.0f;
-		else if (this->Pitch < -89.0f)
-			this->Pitch = -89.0f;
+            glm::vec3 tarDiff = keyframes[keyframeIndex + 1].target - keyframes[keyframeIndex].target;
+            this->Target = keyframes[keyframeIndex].target + tarDiff * tweenFactor;
 
-		updateCameraVectors();
-	}
+            if(time > keyframes[keyframeIndex + 1].time)
+            {
+                keyframeIndex++;
+            }
 
-	void scroll_input(GLfloat deltaY)
-	{
-		if (this->Distance >= 1.0f)
-			this->Distance -= deltaY * MouseSensitivity;
+            updateCameraVectors();
+        }
+    }
 
-		if (this->Distance < 1.0f)
-			this->Distance = 1.0f;
+    void addKeyframe(struct CameraKeyframe newKey)
+    {
+        keyframes.push_back(newKey);
+    }
 
-		updateCameraVectors();
-	}
-
-	void pan_camera(GLfloat deltaX, GLfloat deltaY)
-	{
-		//Reduce strength of mouse movement
-		deltaX *= this->PanSpeed;
-		deltaY *= this->PanSpeed;
-
-		this->Target -= this->Up * deltaY;
-		this->Target -= this->Right * deltaX;
-
-		updateCameraVectors();
-	}
-
-private:
-
-	void updateCameraVectors()
-	{
-		glm::vec3 cameraFront;
-		cameraFront = glm::vec3(cos(glm::radians(this->Pitch)) * cos(glm::radians(this->Yaw)), sin(glm::radians(this->Pitch)), cos(glm::radians(this->Pitch)) * sin(glm::radians(this->Yaw)));
-
-		this->Front = glm::normalize(cameraFront);
-		this->Right = glm::normalize(glm::cross(this->Front, this->WorldUp));
-		this->Up = glm::normalize(glm::cross(this->Right, this->Front));
-
-		this->Position = this->Target - Distance * this->Front;
-	}
+    virtual void ResetObject()
+    {
+        keyframeIndex = 0;
+    }
 };
 
 #endif

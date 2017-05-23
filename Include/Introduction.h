@@ -10,10 +10,13 @@
 
 #include "ShaderLoader.h"
 #include "fps_camera.h"
+
 #include "Light.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
+
+class ThreeD_Camera;
 
 //static const AMBIENT_STRENGTH = 0.1f;
 static const glm::vec3 LIGHT_COLOUR = glm::vec3(0.8f, 0.8f, 0.8f);
@@ -47,7 +50,15 @@ struct TankKeyframe
     GLfloat time;
 };
 
+struct CameraKeyframe
+{
+    glm::vec3 position;
+    glm::vec3 target;
+    GLfloat time;
+};
+
 /* Set up the camera */
 extern FPS_Camera camera;
+extern ThreeD_Camera tourCamera;
 
 #endif // INTRO_H

@@ -5,8 +5,9 @@
 #include "../Include/transport/TransportObject.h"
 #include "../Include/CWObject.h"
 #include "../Include/Light.h"
+#include "../Include/BLCamera.h"
 
-void SetupAnimation(TankObject &duskTank, TankObject &dawnTank, TransportObject &duskTransport, TransportObject &dawnTransport)
+void SetupAnimation(TankObject &duskTank, TankObject &dawnTank, TransportObject &duskTransport, TransportObject &dawnTransport, ThreeD_Camera &camera)
 {
     /* Fly in */
     glm::vec3 duskTankOffset(0.0f, -2.0f, 2.0f);
@@ -16,6 +17,17 @@ void SetupAnimation(TankObject &duskTank, TankObject &dawnTank, TransportObject 
 
     glm::vec3 duskTeamSpawn(0.0f, 20.0f, -600.0f);
     glm::vec3 duskTeamLanding(0.0f, 20.0f, -60.0f);
+
+    glm::vec3 dawnTeamSpawn(0.0f, 20.0f, 600.0f);
+    glm::vec3 dawnTeamLanding(0.0f, 20.0f, 50.0f);
+
+    camera.addKeyframe({glm::vec3(-60.0f, 20.0f, -30.0f), glm::vec3(-60.0f, 60.0f, -100.0f), 0.0f});
+    camera.addKeyframe({glm::vec3(-60.0f, 20.0f, -30.0f), glm::vec3(-60.0f, 60.0f, -100.0f), 5.0f});
+    camera.addKeyframe({glm::vec3(-80.0f, 20.0f, -30.0f), glm::vec3(0.0f, 20.0f, 0.0f), 10.0f});
+    camera.addKeyframe({glm::vec3(-80.0f, 20.0f, -60.0f), glm::vec3(0.0f, -100.0f, 0.0f), 15.0f});
+    camera.addKeyframe({duskTeamLanding + glm::vec3(-10.0f, 0.0f, -5.0f), duskTeamLanding, 20.0f});
+    camera.addKeyframe({duskTeamLanding + glm::vec3(-5.0f, 0.0f, -15.0f), duskTeamLanding, 22.0f});
+    camera.addKeyframe({duskTeamLanding + glm::vec3(10.0f, 0.0f, -15.0f), duskTeamLanding + duskTankOffset, 25.0f});
 
     duskTank.addKeyframe({duskTeamSpawn + duskTankOffset, glm::quat(), 0.0f});
     duskTank.addTurretKeyframe({0.0f, 0.0f});
@@ -28,9 +40,6 @@ void SetupAnimation(TankObject &duskTank, TankObject &dawnTank, TransportObject 
     duskTransport.addKeyframe({duskTeamLanding, glm::quat(), 20.0f});
     duskTransport.addArm1Keyframe({0.0f, 20.0f});
     duskTransport.addArm2Keyframe({0.0f, 20.0f});
-
-    glm::vec3 dawnTeamSpawn(0.0f, 20.0f, 600.0f);
-    glm::vec3 dawnTeamLanding(0.0f, 20.0f, 50.0f);
 
     dawnTank.addKeyframe({dawnTeamSpawn + dawnTankOffset, dawnRotation, 0.0f});
     dawnTank.addTurretKeyframe({0.0f, 0.0f});
@@ -45,7 +54,6 @@ void SetupAnimation(TankObject &duskTank, TankObject &dawnTank, TransportObject 
     dawnTransport.addArm2Keyframe({0.0f, 25.0f});
 
     /* Release tanks */
-
     duskTank.addKeyframe({duskTeamLanding + duskTankOffset, glm::quat(), 28.0f});
     duskTransport.addKeyframe({duskTeamLanding, glm::quat(), 28.0f});
     duskTransport.addArm1Keyframe({0.0f, 28.0f});
@@ -69,6 +77,11 @@ void SetupAnimation(TankObject &duskTank, TankObject &dawnTank, TransportObject 
     dawnTank.addKeyframe({dawnTeamLanding + glm::vec3(0.0f, -14.0f, -2.0f), glm::angleAxis(glm::radians(-10.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * dawnRotation, 30.2f});
     dawnTank.addKeyframe({dawnTeamLanding + glm::vec3(0.0f, -17.0f, -2.5f), glm::angleAxis(glm::radians(2.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * dawnRotation, 30.7f});
     dawnTank.addKeyframe({dawnTeamLanding + glm::vec3(0.0f, -16.0f, -2.0f), dawnRotation, 31.2f});
+
+    camera.addKeyframe({duskTeamLanding + glm::vec3(10.0f, 0.0f, -15.0f), duskTeamLanding + duskTankOffset, 28.0f});
+    camera.addKeyframe({duskTeamLanding + glm::vec3(0.0f, -14.0f, 2.0f) + glm::vec3(0.0f, 3.0f, -8.0f), duskTeamLanding + glm::vec3(0.0f, -12.0f, 2.0f), 30.0f});
+    camera.addKeyframe({duskTeamLanding + glm::vec3(0.0f, -17.0f, 2.0f) + glm::vec3(0.0f, 3.0f, -8.0f), duskTeamLanding + glm::vec3(0.0f, -15.0f, 2.0f), 30.5f});
+    camera.addKeyframe({duskTeamLanding + glm::vec3(0.0f, -16.0f, 2.0f) + glm::vec3(0.0f, 3.0f, -8.0f), duskTeamLanding + glm::vec3(0.0f, -14.0f, 2.0f), 31.0f});
 
     /* Transports leave */
 
@@ -130,6 +143,11 @@ void SetupAnimation(TankObject &duskTank, TankObject &dawnTank, TransportObject 
     dawnTank.addFireKeyframe(39.0f);
     dawnTank.addKeyframe({glm::vec3(30.0f, 4.0f, -50.0f), glm::angleAxis(glm::radians(-110.0f), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f))), 49.0f});
 
+    camera.addKeyframe({duskStart + glm::vec3(0.0f, 3.0f, -8.0f), duskStart + glm::vec3(0.0f, 2.0f, 0.0f), 33.3f});
+    camera.addKeyframe({dawnStart + glm::vec3(13.0f, 3.0f, 0.0f), dawnStart + glm::vec3(0.0f, 2.0f, 0.0f), 38.5f});
+    camera.addKeyframe({glm::vec3(30.0f, 4.0f, -50.0f) + glm::vec3(20.0f, 3.0f, 0.0f), glm::vec3(30.0f, 4.0f, -50.0f) + glm::vec3(0.0f, 2.0f, 0.0f), 44.0f});
+    camera.addKeyframe({glm::vec3(30.0f, 4.0f, -50.0f) + glm::vec3(0.0f, 3.0f, -8.0f), glm::vec3(30.0f, 4.0f, -50.0f) + glm::vec3(0.0f, 2.0f, 0.0f), 49.0f});
+
     /* Final clash */
 
     duskTank.addKeyframe({glm::vec3(-10.0f, 4.0f, -60.0f), glm::angleAxis(glm::radians(65.0f), glm::vec3(0.0f, 1.0f, 0.0f)), 52.0f});
@@ -152,6 +170,14 @@ void SetupAnimation(TankObject &duskTank, TankObject &dawnTank, TransportObject 
     dawnTank.addKeyframe({glm::vec3(12.0f, 4.0f, -73.0f), glm::angleAxis(glm::radians(-110.0f), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f))), 61.0f});
     dawnTank.addKeyframe({glm::vec3(14.0f, 4.0f, -70.0f), glm::angleAxis(glm::radians(-110.0f), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f))), 62.0f});
     dawnTank.addKeyframe({glm::vec3(15.0f, 4.0f, -66.0f), glm::angleAxis(glm::radians(-140.0f), glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f))), 64.0f});
+
+    camera.addKeyframe({glm::vec3(30.0f, 4.0f, -55.0f) + glm::vec3(0.0f, 3.0f, -8.0f), glm::vec3(10.0f, 4.0f, -55.0f), 52.0f});
+    camera.addKeyframe({glm::vec3(30.0f, 4.0f, -79.0f) + glm::vec3(0.0f, 3.0f, -8.0f), glm::vec3(10.0f, 4.0f, -79.0f), 61.0f});
+    camera.addKeyframe({glm::vec3(30.0f, 4.0f, -79.0f) + glm::vec3(0.0f, 3.0f, -8.0f), glm::vec3(10.0f, 2.0f, -81.0f), 61.5f});
+    camera.addKeyframe({glm::vec3(30.0f, 4.0f, -79.0f) + glm::vec3(0.0f, 3.0f, -8.0f), glm::vec3(10.0f, -2.0f, -84.0f), 62.0f});
+    camera.addKeyframe({glm::vec3(30.0f, 4.0f, -79.0f) + glm::vec3(0.0f, 3.0f, -8.0f), glm::vec3(10.0f, -20.0f, -90.0f), 65.0f});
+    camera.addKeyframe({glm::vec3(30.0f, 4.0f, -79.0f) + glm::vec3(0.0f, 3.0f, -8.0f), glm::vec3(10.0f, -20.0f, -90.0f), 67.0f});
+    camera.addKeyframe({glm::vec3(15.0f, 4.0f, -66.0f) + glm::vec3(0.0f, 3.0f, -8.0f), glm::vec3(15.0f, 4.0f, -66.0f), 70.0f});
 
     /*
     duskTank.addTurretKeyframe({0.0f, 0.0f});

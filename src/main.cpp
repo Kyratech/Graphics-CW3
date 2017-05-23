@@ -2,18 +2,15 @@
 #include <iostream>
 #include <vector>
 
-#include "../Include/CubeGeometry.h"
-#include "../Include/PlaneGeomtery.h"
 #include "../Include/UVSphereGeometry.h"
-#include "../Include/ConeGeometry.h"
 #include "../Include/TriangleMesh.h"
-#include "../Include/LineArray.h"
 #include "../Include/GraphicsObject.h"
 #include "../Include/OBJMesh.h"
 #include "../Include/tank/TankObject.h"
 #include "../Include/transport/TransportObject.h"
 #include "../Include/Skybox.h"
 #include "../Include/Animation.h"
+#include "../Include/BLCamera.h"
 
 //Physics
 #include "../Include/CWPhysicsObject.h"
@@ -22,6 +19,7 @@
 
 glm::vec3 cameraPos = glm::vec3(0.0f, 10.0f, 0.0f);
 FPS_Camera camera(cameraPos);
+ThreeD_Camera tourCamera(cameraPos);
 
 /* Screen parameters */
 const int width = 1600;
@@ -149,7 +147,7 @@ int main(void)
     TransportObject dawnTransport("Images/DawnTransport/Transport_Dawn", glm::vec3(0.0f, 5.0f, 30.0f), glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
     gObjects.push_back(&dawnTransport);
 
-    SetupAnimation(duskTank, dawnTank, duskTransport, dawnTransport);
+    SetupAnimation(duskTank, dawnTank, duskTransport, dawnTransport, tourCamera);
 
     /* Environment objects */
     PhysicsConvexMesh rockCollider(false, "Models/Rock1.obj", 1.0f, glm::vec3(20.0f, 0.0f, 60.0f), glm::vec3(0.0f), &world);
@@ -204,6 +202,7 @@ int main(void)
 		dawnProjectile.UpdateLight();
 
 		camera.cameraMove(deltaTime);
+		tourCamera.MotionTween(simulationTime);
 
 		/* Generate the view matrix */
 		glm::mat4 view;
@@ -221,6 +220,9 @@ int main(void)
             break;
         case 2:
             view = glm::lookAt(glm::vec3(0.0f, 150.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            break;
+        case 3:
+            view = tourCamera.GetViewMatrix();
             break;
 		}
 
@@ -300,6 +302,7 @@ void ResetAnimation()
     {
         gObjects[i]->ResetObject();
     }
+    tourCamera.ResetObject();
 }
 
 // RenderQuad() Renders a 1x1 quad in NDC, best used for framebuffer color targets
